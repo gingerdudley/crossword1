@@ -454,7 +454,7 @@ public class Crossword {
 										continue;
 									}
 								}
-								if(word.word.length() - letterIndex + j + 1 < (dSize + 1)){
+								if(word.word.length() - letterIndex + j + 1 < (dSize)){
 									if(!holderBoard[i]
 											[word.word.length() - letterIndex + j + 1].equals("@")) {
 										//then we cant place the word here and we need to continue
@@ -557,7 +557,7 @@ public class Crossword {
 									//this could be wrong, check over this later
 									wordLegal = false;
 									continue;
-								} else if((word.word.length() - letterIndex) + i > (aSize + 1)) {
+								} else if((word.word.length() - letterIndex) + i > (aSize)) {
 									//if the word is too long for the board also break this 
 									wordLegal = false;
 									continue;
@@ -569,7 +569,7 @@ public class Crossword {
 										continue;
 									}
 								}
-								if(word.word.length() - letterIndex + i + 1 < (aSize + 1)){
+								if(word.word.length() - letterIndex + i + 1 < (aSize)){
 									if(!holderBoard[ word.word.length() - letterIndex + i + 1]
 											[j].equals("@")) {
 										//then we cant place the word here and we need to continue
