@@ -30,7 +30,6 @@ public class Crossword1 {
 		for(int j = acrossWords.length; j < downWords.length + acrossWords.length; j++) {
 			words[j] = downWords[j - acrossWords.length];
 		}
-		//boolean allWordsPlaced = false;
 		//automatically place the first word in the middle of the board, then recurse until find a solution
 		int middleX = acrossSize;
 		int middleY = downSize;
@@ -40,9 +39,7 @@ public class Crossword1 {
 			//place the first word on the board and then recurse
 			String chara = String.valueOf(firstWord.charAt(i));
 			board[middleY][middleX + i] = chara;
-		}
-		
-		
+		}		
 		words[0].placed = true;
 		words[0].start = new int[2];
 		words[0].start[0] = middleY;
@@ -66,47 +63,63 @@ public class Crossword1 {
 			words[matchIndex].placed = true;
 			words[matchIndex].start = new int[2];
 			words[matchIndex].start[0] = middleY;
-			words[matchIndex].start[1] = middleX;
-			
-			
-		}
-		
+			words[matchIndex].start[1] = middleX;			
+		}		
 		printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
 		//boolean worked = findNextWord(acrossWords.length, downWords.length, words, board);
-		findNextWord(acrossWords.length, downWords.length, words, board);
-		//first word is successfully place, now recurse on the rest of the words and the board
+		boolean worked = findNextWord(acrossWords.length, downWords.length, words, board, true);
 	}
 	
 	//this is the function that will backtrack over all the words and try to find the correct placement
-	//first try to place all the across words, see if there is a down word on the board
-	//aka have an loop going through the down words to see if any have been placed
 	
-	public void findNextWord(int acrossCount, int downCount, Word[] words, String[][] board) {
+	public boolean findNextWord(int acrossCount, int downCount, Word[] words, String[][] board, boolean firstRound) {
 		//this function will find the next word that can be placed on the board and then call the placeWord function
 		//will start by going through the across array to try to place all words
 		//vector of word indexes that still need to be placed
 		
-		//need to account for 
-		boolean allAcrossPlaced = true;
+		//*******************
+		//***testing to see if this prints and what it does / how it works 
+		int acrossSize = 0;
+		int downSize = 0;
+		for(int i = 0; i < acrossCount; i++) {
+			acrossSize += words[i].word.length();
+		}
+		for(int j = 0; j < downCount; j++) {
+			downSize += words[j + acrossCount].word.length();
+		}
+		printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
+		//*********************
+		//*********************
+		
 		Vector<Integer> acrossWordIndex = new Vector<Integer>();
 		for(int i = 0; i < acrossCount; i++) {
-			if(words[i].placed == false) {
-				allAcrossPlaced = false;
+			if(words[i].placed == true) {
 				acrossWordIndex.add(i);
 			}	
 		}
-		//idk why i even have this condition and i might remove in the future
-		if(!allAcrossPlaced) {
-			//if the across words aren't placed then we need to place them, starting with the first word in the vector
-			//check to see if you can place the current word with a down word
-			//run through the down words and see if any are placed
-			Vector<Integer> downWordIndex = new Vector<Integer>();
-			for(int j = 0; j < downCount; j++) {
-				if(words[j + acrossCount].placed == true) {
-					downWordIndex.add(j + acrossCount);
-					//we will check these words and see if we can place them with the across word
-				}
+		
+		Vector<Integer> downWordIndex = new Vector<Integer>();
+		for(int j = 0; j < downCount; j++) {
+			if(words[j + acrossCount].placed == true) {
+				downWordIndex.add(j + acrossCount);
+				//we will check these words and see if we can place them with the across word
 			}
+		}
+		
+		if(downWordIndex.size() == downCount && acrossWordIndex.size() == acrossCount) {
+//			int acrossSize = 0;
+//			int downSize = 0;
+//			for(int i = 0; i < acrossCount; i++) {
+//				acrossSize += words[i].word.length();
+//			}
+//			for(int j = 0; j < downCount; j++) {
+//				downSize += words[j + acrossCount].word.length();
+//			}
+			printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
+			return true;
+			//then all of the words have been placed on the board
+			
+		} else {
 			Vector<PossiblePlay> possiblePlays = new Vector<PossiblePlay>();
 			//need to do certian things for down words and certian for across words
 			if(downWordIndex.size() == 0) {
@@ -147,83 +160,183 @@ public class Crossword1 {
 					}
 				}
 			} else {
-				//then we can try to place a word on this word
-				//so get a vector os possible positions that the new word can go
-				//create an object of these possible words
-				
-				//go through the vector of placed down words and compare them with the across words
-				//Vector<PossiblePlay> possiblePlays = new Vector<PossiblePlay>();
-				for(int a = 0; a < downWordIndex.size(); a++) {
-					Word downWord = words[downWordIndex.get(a)];
-					for(int b = 0; b < acrossCount; b++) {
-						//now go through the words and see if any of the letters are the same
-						if(words[b].placed == true) {
-							continue;
-							//we don't want to replace this word on the board so we need to continue on
-						}
-						String downW = downWord.word;
-						String acrossW = words[b].word;
-						Word wordAcross = words[b];
-						for(int c = 0; c < downW.length(); c++) {
-							String downChar = String.valueOf(downW.charAt(c));
-							for(int d = 0; d < acrossW.length(); d++) {
-								String acrossChar = String.valueOf(acrossW.charAt(d));
-								if(downChar.equals(acrossChar)) {
-									//check if this is a legal move
-									//the start of the word would be the intersection - the # of chars before
-									int startX = downWord.start[1] - d;
-									//something is up with this, shouldnt matter where the word starts
-									//cut should be where they intersect
-									int startY = downWord.start[0] + c;
-									int intersection = d;
-									//^these are the coordinates of where the word would be placed if legal
-									boolean legal = legalAcrossMove(board, wordAcross, startX, startY, intersection);
-									//if this word is legal then we need to add it to the vector
-									if(legal) {
-										PossiblePlay play = new PossiblePlay();
-										play.word = wordAcross;
-										play.xStart = startX;
-										play.yStart = startY;
-										play.intersection = intersection;
-										possiblePlays.add(play);
-										//^ this vector should hold all of the possible across plays 
-										//from the current board
+				if(downWordIndex.size() != downCount){
+					//this is for words that we want to place down 
+					
+					//if there are down words that still need to be played
+					//then we can try to place a word on this word
+					//so get a vector os possible positions that the new word can go
+					//create an object of these possible words
+					
+					//go through the vector of placed down words and compare them with the across words
+					for(int a = 0; a < acrossWordIndex.size(); a++) {
+						Word acrosssWord = words[acrossWordIndex.get(a)];
+						for(int b = 0; b < downCount; b++) {
+							//now go through the words and see if any of the letters are the same
+							if(words[b + acrossCount].placed == true) {
+								continue;
+								//we don't want to replace this word on the board so we need to continue on
+							}
+							String acrossW = acrosssWord.word;
+							String downW = words[b + acrossCount].word;
+							Word wordDown = words[b + acrossCount];
+							for(int c = 0; c < acrossW.length(); c++) {
+								String acrossChar = String.valueOf(acrossW.charAt(c));
+								for(int d = 0; d < downW.length(); d++) {
+									String downChar = String.valueOf(downW.charAt(d));
+									if(downChar.equals(acrossChar)) {
+										//check if this is a legal move
+										//the start of the word would be the intersection - the # of chars before
+										int startX = acrosssWord.start[1] + c;
+										//something is up with this, shouldnt matter where the word starts
+										//cut should be where they intersect
+										int startY = acrosssWord.start[0] - d;
+										int intersection = d;
+										//^these are the coordinates of where the word would be placed if legal
+										boolean legal = legalDownMove(board, wordDown, startX, startY, intersection);
+										//if this word is legal then we need to add it to the vector
+										if(legal) {
+											PossiblePlay play = new PossiblePlay();
+											play.word = wordDown;
+											play.xStart = startX;
+											play.yStart = startY;
+											play.intersection = intersection;
+											possiblePlays.add(play);
+											//^ this vector should hold all of the possible across plays 
+											//from the current board
+										}
+										//then this is a possible play and add it to the vector of possible plays
 									}
-									//then this is a possible play and add it to the vector of possible plays
+									
 								}
-								
+							}
+							//then check if this is a legal move
+						}
+					}
+					
+				} 
+				
+				if(acrossWordIndex.size() != acrossCount) {
+					//then we can try to place a word on this word
+					//so get a vector os possible positions that the new word can go
+					//create an object of these possible words
+					
+					//go through the vector of placed down words and compare them with the across words
+					//Vector<PossiblePlay> possiblePlays = new Vector<PossiblePlay>();
+					for(int a = 0; a < downWordIndex.size(); a++) {
+						Word downWord = words[downWordIndex.get(a)];
+						for(int b = 0; b < acrossCount; b++) {
+							//now go through the words and see if any of the letters are the same
+							if(words[b].placed == true) {
+								continue;
+								//we don't want to replace this word on the board so we need to continue on
+							}
+							String downW = downWord.word;
+							String acrossW = words[b].word;
+							Word wordAcross = words[b];
+							for(int c = 0; c < downW.length(); c++) {
+								String downChar = String.valueOf(downW.charAt(c));
+								for(int d = 0; d < acrossW.length(); d++) {
+									String acrossChar = String.valueOf(acrossW.charAt(d));
+									if(downChar.equals(acrossChar)) {
+										//check if this is a legal move
+										//the start of the word would be the intersection - the # of chars before
+										int startX = downWord.start[1] - d;
+										//something is up with this, shouldnt matter where the word starts
+										//cut should be where they intersect
+										int startY = downWord.start[0] + c;
+										int intersection = d;
+										//^these are the coordinates of where the word would be placed if legal
+										boolean legal = legalAcrossMove(board, wordAcross, startX, startY, intersection);
+										//if this word is legal then we need to add it to the vector
+										if(legal) {
+											PossiblePlay play = new PossiblePlay();
+											play.word = wordAcross;
+											play.xStart = startX;
+											play.yStart = startY;
+											play.intersection = intersection;
+											possiblePlays.add(play);
+											//^ this vector should hold all of the possible across plays 
+											//from the current board
+										}
+										//then this is a possible play and add it to the vector of possible plays
+									}
+									
+								}
 							}
 						}
-						//then check if this is a legal move
 					}
 				}
-				//here we have all the possible moves at the moment from the across words
-				//now we need to go through this vector and see if the recursion of that move is also legal
-//				for(int aa = 0; aa < possiblePlays.size(); aa++) {
-//					//place the word on the board
-//					//recurse
-//					//if false is returned, then remove the word and try the next word in possiblePlays
-//					placeWordAcross(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
-//							possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
-//					//then recurse and if its false then u have some problems
-//				}
-//				if(possiblePlays.size() == 0) {
-//					return false;
-//				}
-				System.out.println("breaking here to see the possible moves");
 			}
-			for(int aa = 0; aa < possiblePlays.size(); aa++) {
-				//place the word on the board
-				//recurse
-				//if false is returned, then remove the word and try the next word in possiblePlays
-				placeWordAcross(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
-						possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
-				//then recurse and if its false then u have some problems
-			}
-//			if(possiblePlays.size() == 0) {
-//				return false;
-//			}
 			
+			if(possiblePlays.size() == 0) {
+				return false;
+			} else {
+				boolean success = false;
+				for(int aa = 0; aa < possiblePlays.size(); aa++) {
+					//place the word on the board
+					//recurse
+					//if false is returned, then remove the word and try the next word in possiblePlays
+					if(possiblePlays.get(aa).word.across) {
+						placeWordAcross(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
+								possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
+					} else {
+						placeWordDown(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
+								possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
+					}
+					//need to mark that this word has been placed and update its start and stuff
+					//Word justPlaced
+					for(int zz = 0; zz < words.length; zz++) {
+						//need to change some stuff on the word that you just passed in
+						if(words[zz].equals(possiblePlays.get(aa).word)) {
+							words[zz].placed = true;
+							words[zz].start = new int[2];
+							words[zz].start[0] = possiblePlays.get(aa).yStart;
+							words[zz].start[1] = possiblePlays.get(aa).xStart;
+							
+						}
+					}
+						
+					//then recurse and if its false then u have some problems
+					boolean worked = findNextWord(acrossCount, downCount, words, board, false);
+					//if it didn't work u need to undo all of the 
+					//need some marker for if its the first word placed cause then
+					//you should continue up instead of returning false all the way up
+					//have a boolean thats like first placed word
+					if(!worked) {
+						//now mark that that word hasn't been placed
+						for(int zz = 0; zz < words.length; zz++) {
+							//need to change some stuff on the word that you just passed in
+							if(words[zz].equals(possiblePlays.get(aa).word)) {
+								words[zz].placed = false;
+								continue;
+							}
+						}
+						if(possiblePlays.get(aa).word.across) {
+							removeWordAcross(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
+									possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
+						} else {
+							removeWordDown(board, possiblePlays.get(aa).word, possiblePlays.get(aa).xStart,
+									possiblePlays.get(aa).yStart, possiblePlays.get(aa).intersection);
+						}
+						if(!firstRound) {
+							return false;
+						}
+						//return false;
+						//^need to return up that this move didn't work
+					} else {
+						//if this recursive call worked than you can return true 
+						//might need to return the board at some point but we'll deal w later
+						success = true;
+						return true;
+					}
+				}
+				if(success) {
+					return true;
+				} else {
+					return false;
+				}
+			}	
 		}
 	}
 	
@@ -309,11 +422,29 @@ public class Crossword1 {
 		}
 	}
 	
+	public void placeWordDown(String[][] board, Word word, int xStart, int yStart, int intersection) {
+		int length = word.word.length();
+		for(int i = 0; i < length; i ++) {
+			board[yStart + i][xStart] = String.valueOf(word.word.charAt(i));
+			//adding the word to the board Temporarily
+		}
+	}
+
+	
 	public void removeWordAcross(String[][] board, Word word, int xStart, int yStart, int intersection) {
 		int length = word.word.length();
 		for(int i = 0; i < length; i ++) {
 			if(i != intersection) {
 				board[yStart][xStart + i] = "@";
+			}
+		}
+	}
+	
+	public void removeWordDown(String[][] board, Word word, int xStart, int yStart, int intersection) {
+		int length = word.word.length();
+		for(int i = 0; i < length; i ++) {
+			if(i != intersection) {
+				board[yStart + i][xStart] = "@";
 			}
 		}
 	}
@@ -339,7 +470,7 @@ public class Crossword1 {
 		words[0].word = "trojans";
 		words[0].across = true;
 		words[0].number = 1;
-		words[0].match = false;
+		words[0].match = true;
 		words[1].word = "dodgers";
 		words[1].across = true;
 		words[1].number = 2;
@@ -350,8 +481,8 @@ public class Crossword1 {
 		words[2].match = false;
 		words[3].word = "traveler";
 		words[3].across = false;
-		words[3].number = 7;
-		words[3].match = false;
+		words[3].number = 1;
+		words[3].match = true;
 		words[4].word = "gold";
 		words[4].across = false;
 		words[4].number = 4;
