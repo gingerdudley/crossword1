@@ -89,7 +89,7 @@ public class ServerThread extends Thread{
 //		}
 	}
 	
-	public boolean verifyValidity(File f) {
+public boolean verifyValidity(File f) {
 		
 		//actually maybe well return the file contents and return null if the file isnt valid ?
 		//decide this later
@@ -124,42 +124,79 @@ public class ServerThread extends Thread{
 							aNum++;
 							//parse out the line and decide if its valid
 							Word returnedWord = ParseData(line, true);
+							if(returnedWord == null) {
+								return false;
+							}
 							acrossV.add(returnedWord);
 							//add this word to the across array
 						}
 					}
+					if(downFound == false) {
+						return false;
+						//then youre at the end of the file but you have only had across words
+					}
 				}
 				
-			} else if(line.equals("down")) {
-				
+			} 
+			System.out.println("line value: " + line);
+			if(line.equals("down")) {		
 				downFound = true;
-				//while(!downFound) {
-					while ((line = br.readLine()) != null) {
-						line = line.toLowerCase();
-						//process all the contents for the across section
-						if(line.equals("across") && acrossFound == false && dNum != 0) {
-							//return false;
-							//then u need to parse out them words
-						} else if((line.equals("across") && acrossFound == true) || (line.equals("across") && dNum == 0)){
-							return false;
-						} else if(line.equals("down")) {
-							return false;
-						} else {
-							dNum++;
-							//parse out the line and decide if its valid
-							Word returnedWord = ParseData(line, true);
-							downV.add(returnedWord);
-							//add this word to the across array
+				while ((line = br.readLine()) != null) {
+					line = line.toLowerCase();
+					//process all the contents for the across section
+					if(line.equals("across") && acrossFound == false && dNum != 0) {
+						//return false;
+						//then u need to parse out them words
+						while ((line = br.readLine()) != null) {
+							line = line.toLowerCase();
+							if(line.equals("across")) {
+								return false;
+							} else if(line.equals("down") && aNum == 0) {
+								return false;
+								//there are no arguments for the across
+							} else if(line.equals("down")) {
+								return false;
+							} else {
+								aNum++;
+								//parse out the line and decide if its valid
+								Word returnedWord = ParseData(line, true);
+								if(returnedWord == null) {
+									return false;
+								}
+								acrossV.add(returnedWord);
+								//add this word to the across array
+							}
 						}
+						break;
+//						aNum++;
+//						Word returnedWord = ParseData(line, true);
+//						acrossV.add(returnedWord);
+						
+					} else if((line.equals("across") && acrossFound == true) || (line.equals("across") && dNum == 0)){
+						return false;
+					} else if(line.equals("down")) {
+						return false;
+					} else {
+						dNum++;
+						//parse out the line and decide if its valid
+						Word returnedWord = ParseData(line, false);
+						if(returnedWord == null) {
+							return false;
+						}
+						downV.add(returnedWord);
+						//add this word to the across array
 					}
-				//}
-				
+				}
+			}
+			if(aNum == 0 || dNum == 0) {
+				return false;
 			}
 			//check to make sure this 1st line is across or down
 //			while ((line = br.readLine()) != null) {
 //				//now process the line
 //			}
 			fr.close();
+			br.close();
 		} catch (IOException e) {
 			System.out.println("IOException: " + e.getMessage());
 		}
