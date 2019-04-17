@@ -10,6 +10,7 @@ public class ThreadRoom {
 	private int currentNumPlayers = 0;
 	private int maxNumPlayers = 3;
 	private Vector<ServerThread> serverThreads;
+	boolean haveValidFile = false;
 	
 	public ThreadRoom() {
 		ServerSocket ss = null;
@@ -22,12 +23,31 @@ public class ThreadRoom {
 			serverThreads = new Vector<ServerThread>();
 			while(true) {
 				Socket s = ss.accept();
+				//then we need to read a file and determine if it is valid or not
+				//make this method in the serverThread class
+				if(!haveValidFile) {
+					//output this to the client and continue waiting for another thread
+				}
 				currentNumPlayers++;
 				if(currentNumPlayers > maxNumPlayers) {
 					//stop accepting future threads
 				}
 				if(currentNumPlayers == 1) {
 					//ask for the number of players
+					UserClient uc = new UserClient("localhost", 3456);
+					int players = 0;
+					while(true) {
+						players = uc.getNumPlayers();
+						if(players < 1 || players >3) {
+							continue;
+						} else {
+							break;
+							//^then we know that the entered number is between one and three
+						}
+					}
+					
+					System.out.println("this is the number of returned players: " + players);
+					
 				}
 				//^this is a blocking call, were waiting for a client to connect with us
 				System.out.println("Connection from " + s.getInetAddress());

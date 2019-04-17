@@ -107,14 +107,6 @@ public class Crossword1 {
 		}
 		
 		if(downWordIndex.size() == downCount && acrossWordIndex.size() == acrossCount) {
-//			int acrossSize = 0;
-//			int downSize = 0;
-//			for(int i = 0; i < acrossCount; i++) {
-//				acrossSize += words[i].word.length();
-//			}
-//			for(int j = 0; j < downCount; j++) {
-//				downSize += words[j + acrossCount].word.length();
-//			}
 			printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
 			return true;
 			//then all of the words have been placed on the board
@@ -461,7 +453,7 @@ public class Crossword1 {
 	}
 	
 	public void testerHoriz() {
-		Word[] words = new Word[6];
+		Word[] words = new Word[7];
 		for(int i = 0; i < words.length; i++) {
 			words[i] = new Word();
 		}
@@ -491,12 +483,17 @@ public class Crossword1 {
 		words[5].across = false;
 		words[5].number = 5;
 		words[5].match = false;
+		words[6].word = "rat";
+		words[6].across = true;
+		words[6].number = 6;
+		words[6].match = false;
 		
-		Word[] acrossWords = new Word[3];
+		Word[] acrossWords = new Word[4];
 		Word[] downWords = new Word[3];
 		acrossWords[0] = words[0];
 		acrossWords[1] = words[1];
 		acrossWords[2] = words[2];
+		acrossWords[3] = words[6];
 		downWords[0] = words[3];
 		downWords[1] = words[4];
 		downWords[2] = words[5];
