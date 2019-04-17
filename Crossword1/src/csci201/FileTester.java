@@ -4,155 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-public class ServerThread extends Thread{
+public class FileTester {
 	
-	private PrintWriter pw;
-	private BufferedReader br;
-	private ThreadRoom cr;
-	private Lock lock;
-	private Condition con;
-	private int num;
-	private boolean first;
-	private Game g;
-	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number) {
-		try {
-			this.cr = cr;
-			pw = new PrintWriter(s.getOutputStream());
-			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			g = new Game();
-			this.lock = lock;
-			this.con = con;
-			this.num = number;
-			if(num == 1) {
-				first = true;
-			} else {
-				first = false;
-			}
-			this.start();
-		} catch (IOException ioe) {
-			System.out.println("ioe in ServerThread constructor: " + ioe.getMessage());
-		}
-	}
-
-	public void sendMessage(String message) {
-		pw.println(message);
-		pw.flush();
-	}
-	
-	public void run() {
-		try {
-			while(true) {
-				lock.lock();
-				if(!first && !g.isGameReady()) {
-					//then we want to wait for the next people to join
-				}
-				if(!first) {
-					//signal the first player
-					//function in thread room saying someone joined , tell the other players that they've joined
-					//then we have a client and need to await
-					g.setCurrPlayers((g.getCurrPlayers()) + 1);
-					try {
-						con.await();
-						//waiting for the condition
-					} catch(InterruptedException ie) {
-						System.out.println(ie.getMessage());
-					}
-				} else {
-					boolean playGame = false;
-					int numPlayers = 0;
-					while(!playGame) {
-						this.sendMessage("Please enter the number of players: ");
-						String line = br.readLine();
-						//verify number
-						numPlayers = Integer.valueOf(line);
-						if(numPlayers < 1 || numPlayers > 3) {
-							//need to prompt the user again for the number of players
-						}
-					}		
-					g.setNumPlayers(numPlayers);
-					g.setCurrPlayers((g.getCurrPlayers()) + 1);		
-				}
-				first = false;
-				//now the condition is met and we can continue on
-				boolean stop = false;
-				while(!stop) {
-					String line = br.readLine();
-					if(line.contains("END_OF_MESSAGE")) {
-						cr.broadcast("done sending messages", this);
-						stop = true;
-						lock.unlock();
-						cr.clientUnlock();
-					} else {
-						cr.broadcast(line, this);
-					}
-				}
-			}
-		} catch (IOException ioe) {
-			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
-		}
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//this is for the file stuff, maybe move this to another class to clean up the server thread class
-	public File selectFile() {
-		
-		//make sure to make this relative instead of what you have it as rn 
-		File folder = new File("/Users/gingerdudley/git/crossword1/Crossword1/gamedata");
-		File[] listOfFiles = folder.listFiles();
-		//System.out.println(listOfFiles.length);
-		if(listOfFiles.length == 1) {
-			//then there is only one file and we need to return that file to the main game for game play
-			return listOfFiles[0];
-		} else {
-			//randomly select a file from this array to return
-			Random rand = new Random();
-			int max = listOfFiles.length;
-			int randomNum = rand.nextInt((max - 0));
-			//System.out.println("Random number: " + randomNum);
-			return listOfFiles[randomNum];
-		}
-		//System.out.println(listOfFiles[0].getName());
-//		for (File file : listOfFiles) {
-//		    if (file.isFile()) {
-//		        System.out.println(file.getName());
-//		    }
-//		}
-	}
-	
-public boolean verifyValidity(File f) {
+	public boolean verifyValidity(File f) {
 		
 		//actually maybe well return the file contents and return null if the file isnt valid ?
 		//decide this later
@@ -324,5 +183,12 @@ public boolean verifyValidity(File f) {
 		}
 		return word;
 	}
+	
+	public static void main(String[] args) {
+		//test if our file is valid? 
+		File file = new File("/Users/gingerdudley/git/crossword1/Crossword1/gamedata/file1.txt");
+		FileTester ft = new FileTester();
+		boolean valid = ft.verifyValidity(file);
+		System.out.println(valid);
+	}
 }
-

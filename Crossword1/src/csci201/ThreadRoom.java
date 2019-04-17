@@ -4,83 +4,66 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ThreadRoom {
 	
-	private int currentNumPlayers = 0;
-	private int maxNumPlayers = 3;
 	private Vector<ServerThread> serverThreads;
-	boolean haveValidFile = false;
-	
-	public ThreadRoom() {
-		ServerSocket ss = null;
-		int port = 3456;
+	private Vector<Lock> lockVector;
+	private Vector<Condition> conditionVector;
+	private Vector<Condition> waitingVector;
+	private int num = 0;
+	private int threadNum = 0;
+	//private int 
+	public ThreadRoom(int port) {
 		try {
-			//instantiate our server socket and send the operating system a request to bind to the port
-			System.out.println("Trying to bind to port: " + port);
-			ss = new ServerSocket(port);
+			System.out.println("Binding to port " + port);
+			ServerSocket ss = new ServerSocket(port);
 			System.out.println("Bound to port " + port);
 			serverThreads = new Vector<ServerThread>();
+			lockVector = new Vector<Lock>();
+			conditionVector = new Vector<Condition>();
+			waitingVector = new Vector<Condition>();
 			while(true) {
-				Socket s = ss.accept();
-				//then we need to read a file and determine if it is valid or not
-				//make this method in the serverThread class
-				if(!haveValidFile) {
-					//output this to the client and continue waiting for another thread
-				}
-				currentNumPlayers++;
-				if(currentNumPlayers > maxNumPlayers) {
-					//stop accepting future threads
-				}
-				if(currentNumPlayers == 1) {
-					//ask for the number of players
-					UserClient uc = new UserClient("localhost", 3456);
-					int players = 0;
-					while(true) {
-						players = uc.getNumPlayers();
-						if(players < 1 || players >3) {
-							continue;
-						} else {
-							break;
-							//^then we know that the entered number is between one and three
-						}
-					}
-					
-					System.out.println("this is the number of returned players: " + players);
-					
-				}
-				//^this is a blocking call, were waiting for a client to connect with us
-				System.out.println("Connection from " + s.getInetAddress());
-				ServerThread st = new ServerThread(s, this);
+				Socket s = ss.accept(); // blocking
+				System.out.println("Connection from: " + s.getInetAddress());
+				Lock lock = new ReentrantLock();
+				Condition con = lock.newCondition();
+				Condition conn2 = lock.newCondition();
+				lockVector.add(lock);
+				conditionVector.add(con);
+				waitingVector.add(conn2);
+				num++;
+				ServerThread st = new ServerThread(s, this, lock, con, num);
 				serverThreads.add(st);
-				//st.start
 			}
 		} catch (IOException ioe) {
-			System.out.println("ioe: " + ioe.getMessage());
-		} finally {
-			try {
-				if( ss!= null) {
-					ss.close();
-				}
-			} catch(IOException ioe) {
-				System.out.println("ioe closing stuff: " + ioe.getMessage());
-			}
+			System.out.println("ioe in ChatRoom constructor: " + ioe.getMessage());
 		}
 	}
 	
-	public void broadcast(String message, ServerThread currentST) {
-		//in this we need to iterate through all the server threads and send the message back out to them
-		if(message != null) {
+	public void broadcast(String message, ServerThread st) {
+		if (message != null) {
 			System.out.println(message);
-			for(ServerThread st: serverThreads) {
-				if(st != currentST) {
-					st.sendMessage(message);
+			for(ServerThread threads : serverThreads) {
+				if (st != threads) {
+					threads.sendMessage(message);
 				}
 			}
 		}
 	}
 	
-	public static void main(String[] args) {
-		ThreadRoom tr = new ThreadRoom();
+	public void clientUnlock(){
+		threadNum = (threadNum + 1)%serverThreads.size();
+		lockVector.get(threadNum).lock();
+		conditionVector.get((threadNum)).signalAll();
+		lockVector.get(threadNum).unlock();	
+		//this will unlock the next client and accept messages from them
+	}
+	
+	public static void main(String [] args) {
+		ThreadRoom cr = new ThreadRoom(6789);
 	}
 }
