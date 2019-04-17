@@ -14,6 +14,7 @@ public class ThreadRoom {
 	private Vector<Lock> lockVector;
 	private Vector<Condition> conditionVector;
 	private Vector<Condition> waitingVector;
+	private Game game;
 	private int num = 0;
 	private int threadNum = 0;
 	//private int 
@@ -26,6 +27,7 @@ public class ThreadRoom {
 			lockVector = new Vector<Lock>();
 			conditionVector = new Vector<Condition>();
 			waitingVector = new Vector<Condition>();
+			game = new Game();
 			while(true) {
 				Socket s = ss.accept(); // blocking
 				System.out.println("Connection from: " + s.getInetAddress());
@@ -36,7 +38,7 @@ public class ThreadRoom {
 				conditionVector.add(con);
 				waitingVector.add(conn2);
 				num++;
-				ServerThread st = new ServerThread(s, this, lock, con, num);
+				ServerThread st = new ServerThread(s, this, lock, con, num, game);
 				serverThreads.add(st);
 			}
 		} catch (IOException ioe) {
@@ -64,6 +66,6 @@ public class ThreadRoom {
 	}
 	
 	public static void main(String [] args) {
-		ThreadRoom cr = new ThreadRoom(6789);
+		ThreadRoom cr = new ThreadRoom(3456);
 	}
 }

@@ -26,6 +26,12 @@ public class Game {
 	}
 
 	public boolean isGameReady() {
+		//need to check how many players is ready
+		if(currPlayers != numPlayers) {
+			gameReady = false;
+		} else {
+			gameReady = true;
+		}
 		return gameReady;
 	}
 

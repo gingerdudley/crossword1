@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -27,12 +26,13 @@ public class ServerThread extends Thread{
 	private int num;
 	private boolean first;
 	private Game g;
-	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number) {
+	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number, Game game) {
 		try {
 			this.cr = cr;
 			pw = new PrintWriter(s.getOutputStream());
 			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			g = new Game();
+			g = game;
+			g.setCurrPlayers(g.getCurrPlayers() + 1);
 			this.lock = lock;
 			this.con = con;
 			this.num = number;
@@ -53,39 +53,61 @@ public class ServerThread extends Thread{
 	}
 	
 	public void run() {
+		//System.out.println("here :(");
 		try {
 			while(true) {
+				
+				boolean isReady = g.isGameReady();
+				System.out.println("game is ready : " + isReady);
 				lock.lock();
-				if(!first && !g.isGameReady()) {
-					//then we want to wait for the next people to join
-				}
-				if(!first) {
-					//signal the first player
-					//function in thread room saying someone joined , tell the other players that they've joined
-					//then we have a client and need to await
-					g.setCurrPlayers((g.getCurrPlayers()) + 1);
-					try {
-						con.await();
-						//waiting for the condition
-					} catch(InterruptedException ie) {
-						System.out.println(ie.getMessage());
-					}
-				} else {
-					boolean playGame = false;
+						
+				if(first) {
+					boolean validNum = false;
 					int numPlayers = 0;
-					while(!playGame) {
+					while(!validNum) {
 						this.sendMessage("Please enter the number of players: ");
 						String line = br.readLine();
 						//verify number
 						numPlayers = Integer.valueOf(line);
 						if(numPlayers < 1 || numPlayers > 3) {
 							//need to prompt the user again for the number of players
+						} else {
+							validNum = true;
 						}
 					}		
 					g.setNumPlayers(numPlayers);
-					g.setCurrPlayers((g.getCurrPlayers()) + 1);		
+					first = false;
+				} else {
+					//signal the first player
+					//function in thread room saying someone joined , tell the other players that they've joined
+					//then we have a client and need to await
+					//g.setCurrPlayers((g.getCurrPlayers()) + 1);
+//					try {
+//						con.await();
+//						//waiting for the condition
+//					} catch(InterruptedException ie) {
+//						System.out.println(ie.getMessage());
+//					}
 				}
-				first = false;
+				
+				
+				if(!g.isGameReady()) {
+					//then we want to wait for the next people to join
+					//code block at this line
+					if(!isReady) {
+						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
+					}
+					while(!isReady) {
+						//want to broadcast to everyone that were waiting for the next player
+//						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
+						isReady = g.isGameReady();
+					}
+				} else {
+					//now we can start the game? 
+					cr.broadcast("The game is beginning", this);
+				}
+				
+				//work on this following code 
 				//now the condition is met and we can continue on
 				boolean stop = false;
 				while(!stop) {
@@ -104,6 +126,8 @@ public class ServerThread extends Thread{
 			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
 		}
 	}
+	
+	
 	
 	
 	
