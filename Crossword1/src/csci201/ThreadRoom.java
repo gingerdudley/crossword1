@@ -17,6 +17,7 @@ public class ThreadRoom {
 	private Game game;
 	private int num = 0;
 	private int threadNum = 0;
+	FakeBoard fb;
 	//private int 
 	public ThreadRoom(int port) {
 		try {
@@ -28,6 +29,12 @@ public class ThreadRoom {
 			conditionVector = new Vector<Condition>();
 			waitingVector = new Vector<Condition>();
 			game = new Game();
+			fb = new FakeBoard();
+			game.board = fb.makeFakeB();
+			game.ySize = 13;
+			game.xSize = 11;
+			//^^change this when you actually start integrating the real functional board
+			//set the board rn to the fake board but make note to change this later
 			while(true) {
 				Socket s = ss.accept(); // blocking
 				System.out.println("Connection from: " + s.getInetAddress());
@@ -48,12 +55,21 @@ public class ThreadRoom {
 	
 	public void broadcast(String message, ServerThread st) {
 		if (message != null) {
-			System.out.println(message);
+			//System.out.println(message);
 			for(ServerThread threads : serverThreads) {
-				if (st != threads) {
+				//if (st != threads) {
 					threads.sendMessage(message);
-				}
+				//}
 			}
+		}
+	}
+	
+	public void printBoard() {
+		//this will print the current gameboard
+		for(ServerThread threads : serverThreads) {
+			//if (st != threads) {
+				threads.printBoard(game.board, game.xSize, game.ySize);;
+			//}
 		}
 	}
 	

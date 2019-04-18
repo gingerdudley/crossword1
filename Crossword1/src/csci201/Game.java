@@ -4,6 +4,11 @@ public class Game {
 	private int numPlayers;
 	private int currPlayers; 
 	private boolean gameReady;
+	public String[][] board;
+	//gonna need a different array for the current board vs the correct board
+	public String[][] currentBoard;
+	public int xSize;
+	public int ySize;
 	public Game() {
 		currPlayers = 0;
 		numPlayers = 0;

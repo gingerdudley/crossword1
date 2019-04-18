@@ -52,6 +52,18 @@ public class ServerThread extends Thread{
 		pw.flush();
 	}
 	
+	public void printBoard(String[][] board, int xSize, int ySize) {
+		for(int i = 0; i < ySize; i++) {
+			for(int j = 0; j < xSize; j++) {
+				pw.print(board[i][j] + " ");
+			}
+			pw.println();
+		}
+		
+		pw.println();
+		pw.flush();
+	}
+	
 	public void run() {
 		//System.out.println("here :(");
 		try {
@@ -95,6 +107,8 @@ public class ServerThread extends Thread{
 					//then we want to wait for the next people to join
 					//code block at this line
 					if(!isReady) {
+						System.out.println("current players in game: " + g.getCurrPlayers());
+						System.out.println("num players in game: " + g.getNumPlayers());
 						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 					}
 					while(!isReady) {
@@ -105,6 +119,10 @@ public class ServerThread extends Thread{
 				} else {
 					//now we can start the game? 
 					cr.broadcast("The game is beginning", this);
+					//now we need to start the actual gameplay
+					//now send the board to the players
+					//need to have another function to start the game
+					cr.printBoard();
 				}
 				
 				//work on this following code 

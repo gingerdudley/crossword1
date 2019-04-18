@@ -453,7 +453,7 @@ public class Crossword1 {
 	}
 	
 	public void testerHoriz() {
-		Word[] words = new Word[7];
+		Word[] words = new Word[6];
 		for(int i = 0; i < words.length; i++) {
 			words[i] = new Word();
 		}
@@ -483,17 +483,13 @@ public class Crossword1 {
 		words[5].across = false;
 		words[5].number = 5;
 		words[5].match = false;
-		words[6].word = "rat";
-		words[6].across = true;
-		words[6].number = 6;
-		words[6].match = false;
 		
-		Word[] acrossWords = new Word[4];
+		Word[] acrossWords = new Word[3];
 		Word[] downWords = new Word[3];
 		acrossWords[0] = words[0];
 		acrossWords[1] = words[1];
 		acrossWords[2] = words[2];
-		acrossWords[3] = words[6];
+		//acrossWords[3] = words[6];
 		downWords[0] = words[3];
 		downWords[1] = words[4];
 		downWords[2] = words[5];
