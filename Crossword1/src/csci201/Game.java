@@ -9,9 +9,13 @@ public class Game {
 	public String[][] currentBoard;
 	public int xSize;
 	public int ySize;
+	public boolean started;
+	Word[] acrossWords;
+	Word[] downWords;
 	public Game() {
 		currPlayers = 0;
 		numPlayers = 0;
+		started = false;
 	}
 
 	public int getNumPlayers() {

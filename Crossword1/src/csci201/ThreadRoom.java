@@ -31,6 +31,8 @@ public class ThreadRoom {
 			game = new Game();
 			fb = new FakeBoard();
 			game.board = fb.makeFakeB();
+			fb.setFakeGame(game);
+			//also setting up some fake stuff with the board
 			game.ySize = 13;
 			game.xSize = 11;
 			//^^change this when you actually start integrating the real functional board
@@ -60,6 +62,18 @@ public class ThreadRoom {
 				//if (st != threads) {
 					threads.sendMessage(message);
 				//}
+			}
+		}
+	}
+	
+	public void broadcastMinusCurr(String message, ServerThread st) {
+		//use this to send stuff to the other threads
+		if (message != null) {
+			//System.out.println(message);
+			for(ServerThread threads : serverThreads) {
+				if (st != threads) {
+					threads.sendMessage(message);
+				}
 			}
 		}
 	}

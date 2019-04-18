@@ -103,7 +103,7 @@ public class ServerThread extends Thread{
 				}
 				
 				
-				if(!g.isGameReady()) {
+				if(!g.isGameReady() && !g.started) {
 					//then we want to wait for the next people to join
 					//code block at this line
 					if(!isReady) {
@@ -118,6 +118,7 @@ public class ServerThread extends Thread{
 					}
 				} else {
 					//now we can start the game? 
+					g.started = true;
 					cr.broadcast("The game is beginning", this);
 					//now we need to start the actual gameplay
 					//now send the board to the players
@@ -127,16 +128,49 @@ public class ServerThread extends Thread{
 				
 				//work on this following code 
 				//now the condition is met and we can continue on
-				boolean stop = false;
-				while(!stop) {
+				boolean validAnswer = false;
+				while(!validAnswer) {
+					//ask the current player to make a move and then parse it
+					this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
+					//only want to output this to all the other players
 					String line = br.readLine();
-					if(line.contains("END_OF_MESSAGE")) {
-						cr.broadcast("done sending messages", this);
-						stop = true;
-						lock.unlock();
-						cr.clientUnlock();
+//					if(line.contains("END_OF_MESSAGE")) {
+//						cr.broadcast("done sending messages", this);
+//						validAnswer = true;
+//						lock.unlock();
+//						cr.clientUnlock();
+//					} else {
+//						cr.broadcast(line, this);
+//					}
+					boolean numValid = false;
+					int numm = 0;
+					if(line.equals("d")) {
+						while(!numValid) {
+							this.sendMessage("Which number?");
+							line = br.readLine();
+							numm = Integer.valueOf(line);
+							boolean found = false;
+							for(int i = 0; i < g.downWords.length; i++) {
+								if(g.downWords[i].number == numm) {
+									found = true;
+								}
+							}
+							if(!found) {
+								this.sendMessage("That is not a valid option");
+							} else {
+								numValid = true;
+							}
+						}
+						this.sendMessage("What is your guess for " + numm + " down?");
+						line = br.readLine();
+						//now do some checking but rn just print a simple statement
+						this.sendMessage("You guessed: " + line);
+						
+					} else if(line.equals("a")){
+						this.sendMessage("Which number?");
+						line = br.readLine();
 					} else {
-						cr.broadcast(line, this);
+						//then this isn't valid and we need to continue asking
 					}
 				}
 			}
