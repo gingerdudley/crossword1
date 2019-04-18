@@ -102,7 +102,7 @@ public class ServerThread extends Thread{
 //					}
 				}
 				
-				
+				System.out.println("game is ready" + g.isGameReady());
 				if(!g.isGameReady() && !g.started) {
 					//then we want to wait for the next people to join
 					//code block at this line
@@ -132,6 +132,7 @@ public class ServerThread extends Thread{
 				while(!validAnswer) {
 					//ask the current player to make a move and then parse it
 					this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
+					cr.broadcastMinusCurr("Player's " + num + " turn", this);
 					//only want to output this to all the other players
 					String line = br.readLine();
 //					if(line.contains("END_OF_MESSAGE")) {
@@ -164,11 +165,28 @@ public class ServerThread extends Thread{
 						this.sendMessage("What is your guess for " + numm + " down?");
 						line = br.readLine();
 						//now do some checking but rn just print a simple statement
-						this.sendMessage("You guessed: " + line);
-						
+						this.sendMessage("You guessed: " + line);					
 					} else if(line.equals("a")){
-						this.sendMessage("Which number?");
+						while(!numValid) {
+							this.sendMessage("Which number?");
+							line = br.readLine();
+							numm = Integer.valueOf(line);
+							boolean found = false;
+							for(int i = 0; i < g.acrossWords.length; i++) {
+								if(g.acrossWords[i].number == numm) {
+									found = true;
+								}
+							}
+							if(!found) {
+								this.sendMessage("That is not a valid option");
+							} else {
+								numValid = true;
+							}
+						}
+						this.sendMessage("What is your guess for " + numm + " down?");
 						line = br.readLine();
+						//now do some checking but rn just print a simple statement
+						this.sendMessage("You guessed: " + line);
 					} else {
 						//then this isn't valid and we need to continue asking
 					}
