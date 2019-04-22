@@ -31,6 +31,7 @@ public class ThreadRoom {
 			game = new Game();
 			fb = new FakeBoard();
 			game.board = fb.makeFakeB();
+			game.currentBoard = fb.makeFakeC();
 			fb.setFakeGame(game);
 			//also setting up some fake stuff with the board
 			game.ySize = 13;
@@ -82,7 +83,7 @@ public class ThreadRoom {
 		//this will print the current gameboard
 		for(ServerThread threads : serverThreads) {
 			//if (st != threads) {
-				threads.printBoard(game.board, game.xSize, game.ySize);;
+				threads.printBoard(game.board, game.xSize, game.ySize);
 			//}
 		}
 	}

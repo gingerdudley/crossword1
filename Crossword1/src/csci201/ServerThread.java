@@ -59,7 +59,17 @@ public class ServerThread extends Thread{
 			}
 			pw.println();
 		}
-		
+		pw.println("ACROSS");
+		for(int i = 0; i < g.acrossWordsC.size(); i++) {
+			pw.print(g.acrossWordsC.get(i).number + " ");
+			pw.println(g.acrossWordsC.get(i).question);
+		}
+		pw.println();
+		pw.println("DOWN");
+		for(int i = 0; i < g.downWordsC.size(); i++) {
+			pw.print(g.downWordsC.get(i).number + " ");
+			pw.println(g.downWordsC.get(i).question);
+		}
 		pw.println();
 		pw.flush();
 	}
@@ -122,19 +132,24 @@ public class ServerThread extends Thread{
 					cr.broadcast("The game is beginning", this);
 					//now we need to start the actual gameplay
 					//now send the board to the players
-					//need to have another function to start the game
 					cr.printBoard();
 				}
 				
 				//work on this following code 
 				//now the condition is met and we can continue on
 				boolean validAnswer = false;
+				boolean firstPass = true;
 				while(!validAnswer) {
 					//ask the current player to make a move and then parse it
 					this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
-					cr.broadcastMinusCurr("Player's " + num + " turn", this);
+					if(firstPass) {
+						cr.broadcastMinusCurr("Player's " + num + " turn", this);
+						firstPass = false;
+					}
+//					cr.broadcastMinusCurr("Player's " + num + " turn", this);
 					//only want to output this to all the other players
 					String line = br.readLine();
+					line = line.toLowerCase();
 //					if(line.contains("END_OF_MESSAGE")) {
 //						cr.broadcast("done sending messages", this);
 //						validAnswer = true;
@@ -146,6 +161,7 @@ public class ServerThread extends Thread{
 					boolean numValid = false;
 					int numm = 0;
 					if(line.equals("d")) {
+						int index = 0;
 						while(!numValid) {
 							this.sendMessage("Which number?");
 							line = br.readLine();
@@ -154,27 +170,7 @@ public class ServerThread extends Thread{
 							for(int i = 0; i < g.downWords.length; i++) {
 								if(g.downWords[i].number == numm) {
 									found = true;
-								}
-							}
-							if(!found) {
-								this.sendMessage("That is not a valid option");
-							} else {
-								numValid = true;
-							}
-						}
-						this.sendMessage("What is your guess for " + numm + " down?");
-						line = br.readLine();
-						//now do some checking but rn just print a simple statement
-						this.sendMessage("You guessed: " + line);					
-					} else if(line.equals("a")){
-						while(!numValid) {
-							this.sendMessage("Which number?");
-							line = br.readLine();
-							numm = Integer.valueOf(line);
-							boolean found = false;
-							for(int i = 0; i < g.acrossWords.length; i++) {
-								if(g.acrossWords[i].number == numm) {
-									found = true;
+									index = i;
 								}
 							}
 							if(!found) {
@@ -187,8 +183,48 @@ public class ServerThread extends Thread{
 						line = br.readLine();
 						//now do some checking but rn just print a simple statement
 						this.sendMessage("You guessed: " + line);
+						cr.broadcast("Player " + num + " guessed '" + line + "' for "
+								+ numm + " down", this);
+						if(line.equals(g.downWords[index].word)) {
+							this.sendMessage("Correct!");
+							cr.broadcast("That is correct", this);
+							this.placeWordOnBoard(true, index, g.downWords[index]);
+						}
+					} else if(line.equals("a")){
+						int index = 0;
+						while(!numValid) {
+							this.sendMessage("Which number?");
+							line = br.readLine();
+							numm = Integer.valueOf(line);
+							boolean found = false;
+//							int index = 0;
+							for(int i = 0; i < g.acrossWords.length; i++) {
+								if(g.acrossWords[i].number == numm) {
+									found = true;
+									index = i;
+								}
+							}
+							if(!found) {
+								this.sendMessage("That is not a valid option");
+							} else {
+								numValid = true;
+							}
+						}
+						this.sendMessage("What is your guess for " + numm + " across?");
+						line = br.readLine();
+						//now do some checking but rn just print a simple statement
+						this.sendMessage("You guessed: " + line);
+						
+						cr.broadcast("Player " + num + " guessed '" + line + "' for "
+								+ numm + " across", this);
+						if(line.equals(g.acrossWords[index].word)) {
+							this.sendMessage("Correct!");
+							cr.broadcast("That is correct", this);
+							this.placeWordOnBoard(true, index, g.acrossWords[index]);
+						}
 					} else {
-						//then this isn't valid and we need to continue asking
+						this.sendMessage("That is not a valid option");
+						continue;
 					}
 				}
 			}
@@ -199,7 +235,36 @@ public class ServerThread extends Thread{
 	
 	
 	
-	
+	public void placeWordOnBoard(boolean across, int index, Word word) {
+		//grab the word from the the answer and place it on the guessed board
+		if(across) {
+			//then place the word across starting at that index
+			int x = g.acrossWords[index].start[1];
+			int y = g.acrossWords[index].start[0];
+			for(int i = 0; i < g.acrossWords[index].word.length(); i++) {
+				g.currentBoard[y][x + i] = String.valueOf(g.acrossWords[index].word.charAt(i));
+			}
+			for(int i = 0; i < g.acrossWordsC.size(); i++) {
+				if(g.acrossWordsC.get(i).equals(word)) {
+					g.acrossWordsC.remove(i);
+					break;
+				}
+			}
+		} else {
+			int x = g.downWords[index].start[1];
+			int y = g.downWords[index].start[0];
+			for(int i = 0; i < g.downWords[index].word.length(); i++) {
+				g.currentBoard[y + i][x] = String.valueOf(g.downWords[index].word.charAt(i));
+			}
+			for(int i = 0; i < g.downWordsC.size(); i++) {
+				if(g.downWordsC.get(i).equals(word)) {
+					g.downWordsC.remove(i);
+					break;
+				}
+			}
+		}
+		this.printBoard(g.currentBoard, g.xSize, g.ySize);
+	}
 	
 	
 	
