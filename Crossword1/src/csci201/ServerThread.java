@@ -138,9 +138,17 @@ public class ServerThread extends Thread{
 				//work on this following code 
 				//now the condition is met and we can continue on
 				boolean validAnswer = false;
+				boolean stop = false;
+				//use this to determine what user should be going
 				boolean firstPass = true;
 				while(!validAnswer) {
 					//ask the current player to make a move and then parse it
+					if(stop) {
+						lock.unlock();
+						cr.clientUnlock();
+						validAnswer = true;
+						continue;
+					}
 					this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
 					if(firstPass) {
 						cr.broadcastMinusCurr("Player's " + num + " turn", this);
@@ -150,14 +158,13 @@ public class ServerThread extends Thread{
 					//only want to output this to all the other players
 					String line = br.readLine();
 					line = line.toLowerCase();
-//					if(line.contains("END_OF_MESSAGE")) {
-//						cr.broadcast("done sending messages", this);
-//						validAnswer = true;
+//					if(stop) {
 //						lock.unlock();
 //						cr.clientUnlock();
-//					} else {
-//						cr.broadcast(line, this);
+//						validAnswer = true;
+//						continue;
 //					}
+					//^^^ might need to edit this :(:(:(:( :""( ;(
 					boolean numValid = false;
 					int numm = 0;
 					if(line.equals("d")) {
@@ -187,8 +194,12 @@ public class ServerThread extends Thread{
 								+ numm + " down", this);
 						if(line.equals(g.downWords[index].word)) {
 							this.sendMessage("Correct!");
-							cr.broadcast("That is correct", this);
+							cr.broadcast("That is correct.", this);
 							this.placeWordOnBoard(true, index, g.downWords[index]);
+						} else {
+							this.sendMessage("That is incorrect!");
+							cr.broadcast("That is incorrect.", this);
+							stop = true;
 						}
 					} else if(line.equals("a")){
 						int index = 0;
@@ -219,14 +230,20 @@ public class ServerThread extends Thread{
 								+ numm + " across", this);
 						if(line.equals(g.acrossWords[index].word)) {
 							this.sendMessage("Correct!");
-							cr.broadcast("That is correct", this);
+							cr.broadcast("That is correct.", this);
 							this.placeWordOnBoard(true, index, g.acrossWords[index]);
+						} else {
+							this.sendMessage("That is incorrect!");
+							cr.broadcast("That is incorrect.", this);
+							stop = true;
+							//now it is the next players turn!!
 						}
 					} else {
 						this.sendMessage("That is not a valid option");
 						continue;
 					}
 				}
+				//now we have to lock the stuff
 			}
 		} catch (IOException ioe) {
 			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());

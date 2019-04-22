@@ -89,6 +89,7 @@ public class ThreadRoom {
 	}
 	
 	public void clientUnlock(){
+		//go to office hours and ask about this bc u r wrong
 		threadNum = (threadNum + 1)%serverThreads.size();
 		lockVector.get(threadNum).lock();
 		conditionVector.get((threadNum)).signalAll();
