@@ -121,19 +121,31 @@ public class ServerThread extends Thread{
 						System.out.println("num players in game: " + g.getNumPlayers());
 						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 					}
+					//make this an await and signal if the game is ready
 					while(!isReady) {
 						//want to broadcast to everyone that were waiting for the next player
 //						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 						isReady = g.isGameReady();
 					}
-				} else {
-					//now we can start the game? 
-					g.started = true;
-					cr.broadcast("The game is beginning", this);
-					//now we need to start the actual gameplay
-					//now send the board to the players
-					cr.printBoard();
-				}
+				} 
+				
+//				else {
+//					//now we can start the game? 
+//					g.started = true;
+//					cr.broadcast("The game is beginning", this);
+//					//now we need to start the actual gameplay
+//					//now send the board to the players
+//					cr.printBoard();
+//				}
+				
+				g.started = true;
+				cr.broadcast("The game is beginning", this);
+				//now we need to start the actual gameplay
+				//now send the board to the players
+				cr.printBoard();
+				
+				//maybe add the while true loop here above print board 
+				
 				
 				//work on this following code 
 				//now the condition is met and we can continue on
@@ -145,7 +157,16 @@ public class ServerThread extends Thread{
 					//ask the current player to make a move and then parse it
 					if(stop) {
 						lock.unlock();
+						//^dont need to unlock your lock
 						cr.clientUnlock();
+						//con.await();
+						//^maybe await where the new top of your while true loop is
+						//game set up only happens once
+						
+						
+						//await when its not your turn
+						//send a message to the client saying to type in the stuff and send a message to the other client
+						//saying its not there turn and stuff
 						validAnswer = true;
 						continue;
 					}
