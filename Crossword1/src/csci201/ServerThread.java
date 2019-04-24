@@ -26,12 +26,14 @@ public class ServerThread extends Thread{
 	private int num;
 	private boolean first;
 	private Game g;
+	private int correctAnswers;
 	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number, Game game) {
 		try {
 			this.cr = cr;
 			pw = new PrintWriter(s.getOutputStream());
 			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			g = game;
+			correctAnswers = 0;
 			g.setCurrPlayers(g.getCurrPlayers() + 1);
 			this.lock = lock;
 			this.con = con;
@@ -120,26 +122,43 @@ public class ServerThread extends Thread{
 					}
 					//make this an await and signal if the game is ready
 					while(!isReady) {
+						con.await();
 						isReady = g.isGameReady();
+						//System.out.print("");		
 					}
-				} 
+				} else {
+					//if youre player two you signal player 1 and player 3 signals player 1 and 2
+					if(num == 2) {
+						cr.signalClient(0);
+					} else if (num == 3) {
+						cr.signalClient(0);
+						cr.signalClient(1);
+					}
+				}
 				
 				
 				g.started = true;
-				cr.broadcast("The game is beginning", this);
+				//cr.broadcast("The game is beginning", this);
+				this.sendMessage("The game is beginning");
 				//now we need to start the actual gameplay
 				//now send the board to the players
 				
 				//maybe put the while true loop here
 				boolean round1 = true;
 			while(true) {
-				cr.printBoard();
+				cr.printBoard(this);
 				try {
-					if(num != g.getNumPlayers()) {
+					System.out.println("NUM: " + num + "getnumplayers: " + g.getNumPlayers());
+//					if(num != g.getNumPlayers()) {
+//						con.await();
+//						System.out.println("made it past the await");
+//						//await here for the other stuff
+//					}		
+					if(num != 1) {
 						con.await();
 						System.out.println("made it past the await");
 						//await here for the other stuff
-					}				
+					}		
 					//waiting for the condition
 				} catch(InterruptedException ie) {
 					System.out.println(ie.getMessage());
@@ -148,7 +167,7 @@ public class ServerThread extends Thread{
 				//now add a condition if its the start of the game
 				if(round1) {
 					round1 = false;
-					cr.clientUnlock();
+					cr.startingUnlock();
 					//test this out and see was up
 				}
 				System.out.println("made it here");
@@ -156,6 +175,9 @@ public class ServerThread extends Thread{
 			}
 		} catch (IOException ioe) {
 			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -212,6 +234,7 @@ public class ServerThread extends Thread{
 							+ numm + " down", this);
 					if(line.equals(g.downWords[index].word)) {
 						this.sendMessage("Correct!");
+						this.correctAnswers += 1;
 						cr.broadcast("That is correct.", this);
 						this.placeWordOnBoard(true, index, g.downWords[index]);
 					} else {

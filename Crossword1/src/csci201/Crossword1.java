@@ -462,6 +462,10 @@ public class Crossword1 {
 		System.out.println();
 	}
 	
+	public void resizeBoard() {
+		
+	}
+	
 //	public void testerHoriz() {
 //		Word[] words = new Word[6];
 //		for(int i = 0; i < words.length; i++) {

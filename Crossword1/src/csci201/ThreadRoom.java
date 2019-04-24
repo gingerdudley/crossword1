@@ -79,13 +79,15 @@ public class ThreadRoom {
 		}
 	}
 	
-	public void printBoard() {
+	public void printBoard(ServerThread st) {
 		//this will print the current gameboard
-		for(ServerThread threads : serverThreads) {
-			//if (st != threads) {
-				threads.printBoard(game.board, game.xSize, game.ySize);
-			//}
-		}
+//		for(ServerThread threads : serverThreads) {
+//			//if (st != threads) {
+//				threads.printBoard(game.board, game.xSize, game.ySize);
+//			//}
+//		}
+		st.printBoard(game.board, game.xSize, game.ySize);
+		//only print to the current thread the board
 	}
 	
 	public void clientUnlock(){
@@ -95,6 +97,12 @@ public class ThreadRoom {
 		conditionVector.get((threadNum)).signalAll();
 		lockVector.get(threadNum).unlock();	
 		//this will unlock the next client and accept messages from them
+	}
+	
+	public void signalClient(int num) {
+		lockVector.get(num).lock();
+		conditionVector.get(num).signalAll();
+		lockVector.get(num).unlock();
 	}
 	
 	public void startingUnlock() {

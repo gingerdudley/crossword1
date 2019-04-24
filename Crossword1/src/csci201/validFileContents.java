@@ -43,9 +43,11 @@ public class validFileContents {
 			
 			//test to see if this prints the correct board !!
 			cw.printBoard(vfc.g.board, vfc.g.xSize, vfc.g.ySize);
+			vfc.g.resizeBoard();
 		} else {
 			//notify user that the board is invalid and stuff
 			System.out.println("nullll bitchhhh");
+			//we need to notify the client of this and act accordingly
 		}
 	}
 }
