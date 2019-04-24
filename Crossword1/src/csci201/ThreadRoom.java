@@ -80,14 +80,14 @@ public class ThreadRoom {
 	}
 	
 	public void printBoard(ServerThread st) {
-		//this will print the current gameboard
-//		for(ServerThread threads : serverThreads) {
-//			//if (st != threads) {
-//				threads.printBoard(game.board, game.xSize, game.ySize);
-//			//}
-//		}
 		st.printBoard(game.board, game.xSize, game.ySize);
-		//only print to the current thread the board
+	}
+	
+	public void printBoardAll() {
+		//this will print the current gameboard
+		for(ServerThread threads : serverThreads) {
+			threads.printBoard(game.board, game.xSize, game.ySize);
+		}
 	}
 	
 	public void clientUnlock(){

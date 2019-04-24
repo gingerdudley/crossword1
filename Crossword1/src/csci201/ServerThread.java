@@ -146,14 +146,9 @@ public class ServerThread extends Thread{
 				//maybe put the while true loop here
 				boolean round1 = true;
 			while(true) {
-				cr.printBoard(this);
+				//now we need to put an await back on one and lock one
 				try {
-					System.out.println("NUM: " + num + "getnumplayers: " + g.getNumPlayers());
-//					if(num != g.getNumPlayers()) {
-//						con.await();
-//						System.out.println("made it past the await");
-//						//await here for the other stuff
-//					}		
+					System.out.println("NUM: " + num + "getnumplayers: " + g.getNumPlayers());	
 					if(num != 1) {
 						con.await();
 						System.out.println("made it past the await");
@@ -165,11 +160,11 @@ public class ServerThread extends Thread{
 				}
 				
 				//now add a condition if its the start of the game
-				if(round1) {
-					round1 = false;
-					cr.startingUnlock();
-					//test this out and see was up
-				}
+//				if(round1) {
+//					round1 = false;
+//					cr.startingUnlock();
+//					//test this out and see was up
+//				}
 				System.out.println("made it here");
 				this.playMove();
 			}
@@ -190,14 +185,28 @@ public class ServerThread extends Thread{
 			boolean stop = false;
 			//use this to determine what user should be going
 			boolean firstPass = true;
+			cr.printBoardAll();
 			while(!validAnswer) {
 				//ask the current player to make a move and then parse it
 				if(stop) {
-					lock.unlock();
+					//lock.unlock();
 					cr.clientUnlock();
 					validAnswer = true;
-					return;
+					lock.lock();
+//					firstPass = true;
+					try {
+						con.await();
+						firstPass = true;
+						cr.printBoardAll();
+						stop = false;
+						validAnswer = false;
+					} catch(InterruptedException ie) {
+						System.out.println(ie.getMessage());
+					}
+					//return;
 				}
+				//dont want to print if the last answer was invalid
+				//if()
 				this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
 				if(firstPass) {
 					cr.broadcastMinusCurr("Player's " + num + " turn", this);
@@ -235,11 +244,13 @@ public class ServerThread extends Thread{
 					if(line.equals(g.downWords[index].word)) {
 						this.sendMessage("Correct!");
 						this.correctAnswers += 1;
-						cr.broadcast("That is correct.", this);
+						cr.broadcastMinusCurr("That is correct.", this);
 						this.placeWordOnBoard(true, index, g.downWords[index]);
+						cr.printBoardAll();
 					} else {
 						this.sendMessage("That is incorrect!");
-						cr.broadcast("That is incorrect.", this);
+						cr.broadcastMinusCurr("That is incorrect.", this);
+						//cr.printBoardAll();
 						stop = true;
 					}
 				} else if(line.equals("a")){
@@ -275,7 +286,7 @@ public class ServerThread extends Thread{
 						this.placeWordOnBoard(true, index, g.acrossWords[index]);
 					} else {
 						this.sendMessage("That is incorrect!");
-						cr.broadcast("That is incorrect.", this);
+						cr.broadcastMinusCurr("That is incorrect.", this);
 						stop = true;
 						//now it is the next players turn!!
 					}
