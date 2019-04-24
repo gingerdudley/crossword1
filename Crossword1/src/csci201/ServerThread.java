@@ -75,10 +75,7 @@ public class ServerThread extends Thread{
 	}
 	
 	public void run() {
-		//System.out.println("here :(");
-		try {
-			while(true) {
-				
+		try {	
 				boolean isReady = g.isGameReady();
 				System.out.println("game is ready : " + isReady);
 				lock.lock();
@@ -123,151 +120,149 @@ public class ServerThread extends Thread{
 					}
 					//make this an await and signal if the game is ready
 					while(!isReady) {
-						//want to broadcast to everyone that were waiting for the next player
-//						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 						isReady = g.isGameReady();
 					}
 				} 
 				
-//				else {
-//					//now we can start the game? 
-//					g.started = true;
-//					cr.broadcast("The game is beginning", this);
-//					//now we need to start the actual gameplay
-//					//now send the board to the players
-//					cr.printBoard();
-//				}
 				
 				g.started = true;
 				cr.broadcast("The game is beginning", this);
 				//now we need to start the actual gameplay
 				//now send the board to the players
+				
+				//maybe put the while true loop here
+				boolean round1 = true;
+			while(true) {
 				cr.printBoard();
-				
-				//maybe add the while true loop here above print board 
-				
-				
-				//work on this following code 
-				//now the condition is met and we can continue on
-				boolean validAnswer = false;
-				boolean stop = false;
-				//use this to determine what user should be going
-				boolean firstPass = true;
-				while(!validAnswer) {
-					//ask the current player to make a move and then parse it
-					if(stop) {
-						lock.unlock();
-						//^dont need to unlock your lock
-						cr.clientUnlock();
-						//con.await();
-						//^maybe await where the new top of your while true loop is
-						//game set up only happens once
-						
-						
-						//await when its not your turn
-						//send a message to the client saying to type in the stuff and send a message to the other client
-						//saying its not there turn and stuff
-						validAnswer = true;
-						continue;
-					}
-					this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
-					if(firstPass) {
-						cr.broadcastMinusCurr("Player's " + num + " turn", this);
-						firstPass = false;
-					}
-//					cr.broadcastMinusCurr("Player's " + num + " turn", this);
-					//only want to output this to all the other players
-					String line = br.readLine();
-					line = line.toLowerCase();
-//					if(stop) {
-//						lock.unlock();
-//						cr.clientUnlock();
-//						validAnswer = true;
-//						continue;
-//					}
-					//^^^ might need to edit this :(:(:(:( :""( ;(
-					boolean numValid = false;
-					int numm = 0;
-					if(line.equals("d")) {
-						int index = 0;
-						while(!numValid) {
-							this.sendMessage("Which number?");
-							line = br.readLine();
-							numm = Integer.valueOf(line);
-							boolean found = false;
-							for(int i = 0; i < g.downWords.length; i++) {
-								if(g.downWords[i].number == numm) {
-									found = true;
-									index = i;
-								}
-							}
-							if(!found) {
-								this.sendMessage("That is not a valid option");
-							} else {
-								numValid = true;
-							}
-						}
-						this.sendMessage("What is your guess for " + numm + " down?");
-						line = br.readLine();
-						//now do some checking but rn just print a simple statement
-						this.sendMessage("You guessed: " + line);
-						cr.broadcast("Player " + num + " guessed '" + line + "' for "
-								+ numm + " down", this);
-						if(line.equals(g.downWords[index].word)) {
-							this.sendMessage("Correct!");
-							cr.broadcast("That is correct.", this);
-							this.placeWordOnBoard(true, index, g.downWords[index]);
-						} else {
-							this.sendMessage("That is incorrect!");
-							cr.broadcast("That is incorrect.", this);
-							stop = true;
-						}
-					} else if(line.equals("a")){
-						int index = 0;
-						while(!numValid) {
-							this.sendMessage("Which number?");
-							line = br.readLine();
-							numm = Integer.valueOf(line);
-							boolean found = false;
-//							int index = 0;
-							for(int i = 0; i < g.acrossWords.length; i++) {
-								if(g.acrossWords[i].number == numm) {
-									found = true;
-									index = i;
-								}
-							}
-							if(!found) {
-								this.sendMessage("That is not a valid option");
-							} else {
-								numValid = true;
-							}
-						}
-						this.sendMessage("What is your guess for " + numm + " across?");
-						line = br.readLine();
-						//now do some checking but rn just print a simple statement
-						this.sendMessage("You guessed: " + line);
-						
-						cr.broadcast("Player " + num + " guessed '" + line + "' for "
-								+ numm + " across", this);
-						if(line.equals(g.acrossWords[index].word)) {
-							this.sendMessage("Correct!");
-							cr.broadcast("That is correct.", this);
-							this.placeWordOnBoard(true, index, g.acrossWords[index]);
-						} else {
-							this.sendMessage("That is incorrect!");
-							cr.broadcast("That is incorrect.", this);
-							stop = true;
-							//now it is the next players turn!!
-						}
-					} else {
-						this.sendMessage("That is not a valid option");
-						continue;
-					}
+				try {
+					if(num != g.getNumPlayers()) {
+						con.await();
+						System.out.println("made it past the await");
+						//await here for the other stuff
+					}				
+					//waiting for the condition
+				} catch(InterruptedException ie) {
+					System.out.println(ie.getMessage());
 				}
-				//now we have to lock the stuff
+				
+				//now add a condition if its the start of the game
+				if(round1) {
+					round1 = false;
+					cr.clientUnlock();
+					//test this out and see was up
+				}
+				System.out.println("made it here");
+				this.playMove();
 			}
 		} catch (IOException ioe) {
 			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
+		}
+	}
+	
+	
+	
+	public void playMove() {
+		try {
+			//return here when its the next players turn??
+			boolean validAnswer = false;
+			boolean stop = false;
+			//use this to determine what user should be going
+			boolean firstPass = true;
+			while(!validAnswer) {
+				//ask the current player to make a move and then parse it
+				if(stop) {
+					lock.unlock();
+					cr.clientUnlock();
+					validAnswer = true;
+					return;
+				}
+				this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
+				if(firstPass) {
+					cr.broadcastMinusCurr("Player's " + num + " turn", this);
+					firstPass = false;
+				}
+				String line = br.readLine();
+				line = line.toLowerCase();
+				boolean numValid = false;
+				int numm = 0;
+				if(line.equals("d")) {
+					int index = 0;
+					while(!numValid) {
+						this.sendMessage("Which number?");
+						line = br.readLine();
+						numm = Integer.valueOf(line);
+						boolean found = false;
+						for(int i = 0; i < g.downWords.length; i++) {
+							if(g.downWords[i].number == numm) {
+								found = true;
+								index = i;
+							}
+						}
+						if(!found) {
+							this.sendMessage("That is not a valid option");
+						} else {
+							numValid = true;
+						}
+					}
+					this.sendMessage("What is your guess for " + numm + " down?");
+					line = br.readLine();
+					//now do some checking but rn just print a simple statement
+					this.sendMessage("You guessed: " + line);
+					cr.broadcast("Player " + num + " guessed '" + line + "' for "
+							+ numm + " down", this);
+					if(line.equals(g.downWords[index].word)) {
+						this.sendMessage("Correct!");
+						cr.broadcast("That is correct.", this);
+						this.placeWordOnBoard(true, index, g.downWords[index]);
+					} else {
+						this.sendMessage("That is incorrect!");
+						cr.broadcast("That is incorrect.", this);
+						stop = true;
+					}
+				} else if(line.equals("a")){
+					int index = 0;
+					while(!numValid) {
+						this.sendMessage("Which number?");
+						line = br.readLine();
+						numm = Integer.valueOf(line);
+						boolean found = false;
+	//					int index = 0;
+						for(int i = 0; i < g.acrossWords.length; i++) {
+							if(g.acrossWords[i].number == numm) {
+								found = true;
+								index = i;
+							}
+						}
+						if(!found) {
+							this.sendMessage("That is not a valid option");
+						} else {
+							numValid = true;
+						}
+					}
+					this.sendMessage("What is your guess for " + numm + " across?");
+					line = br.readLine();
+					//now do some checking but rn just print a simple statement
+					this.sendMessage("You guessed: " + line);
+					
+					cr.broadcast("Player " + num + " guessed '" + line + "' for "
+							+ numm + " across", this);
+					if(line.equals(g.acrossWords[index].word)) {
+						this.sendMessage("Correct!");
+						cr.broadcast("That is correct.", this);
+						this.placeWordOnBoard(true, index, g.acrossWords[index]);
+					} else {
+						this.sendMessage("That is incorrect!");
+						cr.broadcast("That is incorrect.", this);
+						stop = true;
+						//now it is the next players turn!!
+					}
+				} else {
+					this.sendMessage("That is not a valid option");
+					continue;
+				}
+			}
+		} catch(IOException ioe) {
+			System.out.println(ioe.getMessage());
 		}
 	}
 	
@@ -304,222 +299,5 @@ public class ServerThread extends Thread{
 		this.printBoard(g.currentBoard, g.xSize, g.ySize);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//this is for the file stuff, maybe move this to another class to clean up the server thread class
-	public File selectFile() {
-		
-		//make sure to make this relative instead of what you have it as rn 
-		File folder = new File("/Users/gingerdudley/git/crossword1/Crossword1/gamedata");
-		File[] listOfFiles = folder.listFiles();
-		//System.out.println(listOfFiles.length);
-		if(listOfFiles.length == 1) {
-			//then there is only one file and we need to return that file to the main game for game play
-			return listOfFiles[0];
-		} else {
-			//randomly select a file from this array to return
-			Random rand = new Random();
-			int max = listOfFiles.length;
-			int randomNum = rand.nextInt((max - 0));
-			//System.out.println("Random number: " + randomNum);
-			return listOfFiles[randomNum];
-		}
-		//System.out.println(listOfFiles[0].getName());
-//		for (File file : listOfFiles) {
-//		    if (file.isFile()) {
-//		        System.out.println(file.getName());
-//		    }
-//		}
-	}
-	
-public boolean verifyValidity(File f) {
-		
-		//actually maybe well return the file contents and return null if the file isnt valid ?
-		//decide this later
-		Vector<Word> acrossV = new Vector<Word>();
-		Vector<Word> downV = new Vector<Word>();
-		//need to keep count of the across and down words to add to the arrays at the end of this
-		try {
-			FileReader fr = new FileReader(f);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			int aNum = 0, dNum = 0;
-			boolean acrossFound = false, downFound = false;
-			line = br.readLine();
-			line = line.toLowerCase();
-			if(!line.equals("across") && !line.equals("down")) {
-				return false;
-			} else if(line.equals("across")){
-				acrossFound = true;
-				while(!downFound) {
-					while ((line = br.readLine()) != null) {
-						line = line.toLowerCase();
-						//process all the contents for the across section
-						if(line.equals("across")) {
-							return false;
-						} else if(line.equals("down") && aNum == 0) {
-							return false;
-							//there are no arguments for the across
-						} else if(line.equals("down")) {
-							downFound = true;
-							break;
-						} else {
-							aNum++;
-							//parse out the line and decide if its valid
-							Word returnedWord = ParseData(line, true);
-							if(returnedWord == null) {
-								return false;
-							}
-							acrossV.add(returnedWord);
-							//add this word to the across array
-						}
-					}
-					if(downFound == false) {
-						return false;
-						//then youre at the end of the file but you have only had across words
-					}
-				}
-				
-			} 
-			System.out.println("line value: " + line);
-			if(line.equals("down")) {		
-				downFound = true;
-				while ((line = br.readLine()) != null) {
-					line = line.toLowerCase();
-					//process all the contents for the across section
-					if(line.equals("across") && acrossFound == false && dNum != 0) {
-						//return false;
-						//then u need to parse out them words
-						while ((line = br.readLine()) != null) {
-							line = line.toLowerCase();
-							if(line.equals("across")) {
-								return false;
-							} else if(line.equals("down") && aNum == 0) {
-								return false;
-								//there are no arguments for the across
-							} else if(line.equals("down")) {
-								return false;
-							} else {
-								aNum++;
-								//parse out the line and decide if its valid
-								Word returnedWord = ParseData(line, true);
-								if(returnedWord == null) {
-									return false;
-								}
-								acrossV.add(returnedWord);
-								//add this word to the across array
-							}
-						}
-						break;
-//						aNum++;
-//						Word returnedWord = ParseData(line, true);
-//						acrossV.add(returnedWord);
-						
-					} else if((line.equals("across") && acrossFound == true) || (line.equals("across") && dNum == 0)){
-						return false;
-					} else if(line.equals("down")) {
-						return false;
-					} else {
-						dNum++;
-						//parse out the line and decide if its valid
-						Word returnedWord = ParseData(line, false);
-						if(returnedWord == null) {
-							return false;
-						}
-						downV.add(returnedWord);
-						//add this word to the across array
-					}
-				}
-			}
-			if(aNum == 0 || dNum == 0) {
-				return false;
-			}
-			//check to make sure this 1st line is across or down
-//			while ((line = br.readLine()) != null) {
-//				//now process the line
-//			}
-			fr.close();
-			br.close();
-		} catch (IOException e) {
-			System.out.println("IOException: " + e.getMessage());
-		}
-		return true;
-	}
-	
-	private Word ParseData(String line, boolean across) {
-		String beginningLine = line;
-		int parameterCount = 0;
-		int paramNum = 0;
-		Word word = new Word();
-		StringTokenizer paramToken = new StringTokenizer(line, "|");
-		while(paramToken.hasMoreTokens()) {
-			paramToken.nextToken();
-			paramNum++;
-		}
-		if(paramNum < 2) {
-			//then we have a problem and need to return null
-		} else {
-			
-			if(across) {
-				word.across = true;
-			} else {
-				word.across = false;
-			}
-			//then we can actually start parsing the data
-			StringTokenizer token = new StringTokenizer(line, "|");
-			while(token.hasMoreTokens()) {
-				//keep reading in the next thing and then see if its formatted correctly
-				if(parameterCount == 0) {
-					String attempt = token.nextToken();
-					try {
-						int num = Integer.parseInt(attempt);
-						word.number = num;
-						//city.setDayLow(low);		
-					} catch(Exception e) {
-						System.out.println("problem converting to an int");
-						return null;
-						//^change this to null once u fix that aspect of this to return the correct type
-					}
-				} else if(parameterCount == 1) {
-					//make sure that the answer doesnt have any white space
-					String attempt = token.nextToken();
-					//make sure that this string doesnt have any white space
-					Pattern pattern = Pattern.compile("\\s");
-					Matcher matcher = pattern.matcher(attempt);
-					boolean found = matcher.find();
-					if(found) {
-						return null;
-						//then there is white space in the answer and this is illegalll
-					} else {
-						word.word = attempt;
-					}
-					
-				} else if (parameterCount == 2) {
-					String attempt = token.nextToken();
-					//^this sting will contain the question
-					word.question = attempt;	
-				}
-				parameterCount++;
-			}
-		}
-		return word;
-	}
 }
 

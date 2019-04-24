@@ -97,6 +97,14 @@ public class ThreadRoom {
 		//this will unlock the next client and accept messages from them
 	}
 	
+	public void startingUnlock() {
+		//we want to unlock the first thread
+		threadNum = (threadNum)%serverThreads.size();
+		lockVector.get(threadNum).lock();
+		conditionVector.get((threadNum)).signalAll();
+		lockVector.get(threadNum).unlock();	
+	}
+	
 	public static void main(String [] args) {
 		ThreadRoom cr = new ThreadRoom(3456);
 	}
