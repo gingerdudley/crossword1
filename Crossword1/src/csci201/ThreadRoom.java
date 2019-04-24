@@ -18,11 +18,12 @@ public class ThreadRoom {
 	private int num = 0;
 	private int threadNum = 0;
 	FakeBoard fb;
+	public ServerSocket ss;
 	//private int 
 	public ThreadRoom(int port) {
 		try {
 			System.out.println("Binding to port " + port);
-			ServerSocket ss = new ServerSocket(port);
+			ss = new ServerSocket(port);
 			System.out.println("Bound to port " + port);
 			serverThreads = new Vector<ServerThread>();
 			lockVector = new Vector<Lock>();
@@ -42,13 +43,14 @@ public class ThreadRoom {
 				Socket s = ss.accept(); // blocking
 				System.out.println("Connection from: " + s.getInetAddress());
 				Lock lock = new ReentrantLock();
+				Lock lock2 = new ReentrantLock();
 				Condition con = lock.newCondition();
 				Condition conn2 = lock.newCondition();
 				lockVector.add(lock);
 				conditionVector.add(con);
 				waitingVector.add(conn2);
 				num++;
-				ServerThread st = new ServerThread(s, this, lock, con, num, game);
+				ServerThread st = new ServerThread(s, this, lock, con, num, game, lock2);
 				serverThreads.add(st);
 			}
 		} catch (IOException ioe) {
@@ -75,6 +77,14 @@ public class ThreadRoom {
 				if (st != threads) {
 					threads.sendMessage(message);
 				}
+			}
+		}
+	}
+	
+	public void deleteThread(ServerThread st) {
+		for(int i = 0; i < serverThreads.size(); i++) {
+			if(serverThreads.get(i) == st) {
+				serverThreads.remove(i);
 			}
 		}
 	}

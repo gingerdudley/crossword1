@@ -27,7 +27,8 @@ public class ServerThread extends Thread{
 	private boolean first;
 	private Game g;
 	private int correctAnswers;
-	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number, Game game) {
+	private Lock commonlock;
+	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number, Game game, Lock lock2) {
 		try {
 			this.cr = cr;
 			pw = new PrintWriter(s.getOutputStream());
@@ -38,6 +39,7 @@ public class ServerThread extends Thread{
 			this.lock = lock;
 			this.con = con;
 			this.num = number;
+			this.commonlock = lock2;
 			if(num == 1) {
 				first = true;
 			} else {
@@ -83,6 +85,7 @@ public class ServerThread extends Thread{
 				lock.lock();
 						
 				if(first) {
+					commonlock.lock();
 					boolean validNum = false;
 					int numPlayers = 0;
 					while(!validNum) {
@@ -98,17 +101,27 @@ public class ServerThread extends Thread{
 					}		
 					g.setNumPlayers(numPlayers);
 					first = false;
+					commonlock.unlock();
+					//unlock the lock until here
 				} else {
-					//signal the first player
-					//function in thread room saying someone joined , tell the other players that they've joined
-					//then we have a client and need to await
-					//g.setCurrPlayers((g.getCurrPlayers()) + 1);
-//					try {
-//						con.await();
-//						//waiting for the condition
-//					} catch(InterruptedException ie) {
-//						System.out.println(ie.getMessage());
-//					}
+					//make a common lock
+					commonlock.lock();
+					commonlock.unlock();
+					//make the other people wait
+					//just lock it and unlock it
+					if(num > g.getNumPlayers()) {
+						this.sendMessage("game is full");
+						cr.deleteThread(this);
+						//cr.ss.close();
+						while(true) {
+							int hi = 0;
+							hi += 1;
+							hi -= 1;
+						}
+					}
+					//figure out how to discard the people that locked before
+					
+					//tell them that the game is already full if the player num is maxed
 				}
 				
 				System.out.println("game is ready" + g.isGameReady());
