@@ -17,20 +17,12 @@ public class Game {
 	Vector<Word> acrossWordsC;
 	Vector<Word> downWordsC;
 	Word[] words;
+	
 	public Game() {
 		currPlayers = 0;
 		numPlayers = 0;
 		started = false;
 	}
-	
-	
-	//this will set up the fake questions rn but make sure to code this out once you have everthing
-	//else up and running
-//	public void setUpQuestions() {
-//		questions = new Vector<String>();
-//		
-//				
-//	}
 
 	public int getNumPlayers() {
 		return numPlayers;

@@ -4,7 +4,7 @@ import java.util.Vector;
 //THE MAIN ARRAY IS Y AND THEN X!!
 
 public class Crossword1 {
-	public void MakeBoardArray(Word[] acrossWords, Word[] downWords) {
+	public void MakeBoardArray(Word[] acrossWords, Word[] downWords, Game game, validFileContents vf) {
 		int acrossSize = 0;
 		int downSize = 0;
 		for(int i = 0; i < acrossWords.length; i++) {
@@ -67,12 +67,13 @@ public class Crossword1 {
 		}		
 		printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
 		//boolean worked = findNextWord(acrossWords.length, downWords.length, words, board);
-		boolean worked = findNextWord(acrossWords.length, downWords.length, words, board, true);
+		boolean worked = findNextWord(acrossWords.length, downWords.length, words, board, true, game, vf);
 	}
 	
 	//this is the function that will backtrack over all the words and try to find the correct placement
 	
-	public boolean findNextWord(int acrossCount, int downCount, Word[] words, String[][] board, boolean firstRound) {
+	public boolean findNextWord(int acrossCount, int downCount, Word[] words, String[][] board, boolean firstRound, Game g, 
+			validFileContents vf) {
 		//this function will find the next word that can be placed on the board and then call the placeWord function
 		//will start by going through the across array to try to place all words
 		//vector of word indexes that still need to be placed
@@ -108,10 +109,19 @@ public class Crossword1 {
 		
 		if(downWordIndex.size() == downCount && acrossWordIndex.size() == acrossCount) {
 			printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
+//			return true;
+			vf.g.acrossWords = new Word[acrossCount];
+			vf.g.downWords = new Word[downCount];
+			vf.g.xSize = (acrossSize * 2 + 1);
+			vf.g.ySize = (downSize * 2 + 1);
+			for(int l = 0; l < acrossCount; l++) {
+				vf.g.acrossWords[l] = words[l];
+			}
+			for(int l = 0; l < downCount; l++) {
+				vf.g.downWords[l] = words[acrossCount + l];
+			}
+			vf.g.board = board;
 			return true;
-			//then all of the words have been placed on the board
-			//and we have all the correct words on the board
-			//we need to somehow return like the word vector
 			
 		} else {
 			Vector<PossiblePlay> possiblePlays = new Vector<PossiblePlay>();
@@ -292,7 +302,7 @@ public class Crossword1 {
 					}
 						
 					//then recurse and if its false then u have some problems
-					boolean worked = findNextWord(acrossCount, downCount, words, board, false);
+					boolean worked = findNextWord(acrossCount, downCount, words, board, false, g, vf);
 					//if it didn't work u need to undo all of the 
 					//need some marker for if its the first word placed cause then
 					//you should continue up instead of returning false all the way up
@@ -452,54 +462,54 @@ public class Crossword1 {
 		System.out.println();
 	}
 	
-	public void testerHoriz() {
-		Word[] words = new Word[6];
-		for(int i = 0; i < words.length; i++) {
-			words[i] = new Word();
-		}
-		
-		//rewriting this to try for the down word and stuff
-		words[0].word = "trojans";
-		words[0].across = true;
-		words[0].number = 1;
-		words[0].match = true;
-		words[1].word = "dodgers";
-		words[1].across = true;
-		words[1].number = 2;
-		words[1].match = false;
-		words[2].word = "csci";
-		words[2].across = true;
-		words[2].number = 3;
-		words[2].match = false;
-		words[3].word = "traveler";
-		words[3].across = false;
-		words[3].number = 1;
-		words[3].match = true;
-		words[4].word = "gold";
-		words[4].across = false;
-		words[4].number = 4;
-		words[4].match = false;
-		words[5].word = "marshall";
-		words[5].across = false;
-		words[5].number = 5;
-		words[5].match = false;
-		
-		Word[] acrossWords = new Word[3];
-		Word[] downWords = new Word[3];
-		acrossWords[0] = words[0];
-		acrossWords[1] = words[1];
-		acrossWords[2] = words[2];
-		//acrossWords[3] = words[6];
-		downWords[0] = words[3];
-		downWords[1] = words[4];
-		downWords[2] = words[5];
-		
-		MakeBoardArray(acrossWords, downWords);
-	}
+//	public void testerHoriz() {
+//		Word[] words = new Word[6];
+//		for(int i = 0; i < words.length; i++) {
+//			words[i] = new Word();
+//		}
+//		
+//		//rewriting this to try for the down word and stuff
+//		words[0].word = "trojans";
+//		words[0].across = true;
+//		words[0].number = 1;
+//		words[0].match = true;
+//		words[1].word = "dodgers";
+//		words[1].across = true;
+//		words[1].number = 2;
+//		words[1].match = false;
+//		words[2].word = "csci";
+//		words[2].across = true;
+//		words[2].number = 3;
+//		words[2].match = false;
+//		words[3].word = "traveler";
+//		words[3].across = false;
+//		words[3].number = 1;
+//		words[3].match = true;
+//		words[4].word = "gold";
+//		words[4].across = false;
+//		words[4].number = 4;
+//		words[4].match = false;
+//		words[5].word = "marshall";
+//		words[5].across = false;
+//		words[5].number = 5;
+//		words[5].match = false;
+//		
+//		Word[] acrossWords = new Word[3];
+//		Word[] downWords = new Word[3];
+//		acrossWords[0] = words[0];
+//		acrossWords[1] = words[1];
+//		acrossWords[2] = words[2];
+//		//acrossWords[3] = words[6];
+//		downWords[0] = words[3];
+//		downWords[1] = words[4];
+//		downWords[2] = words[5];
+//		
+//		MakeBoardArray(acrossWords, downWords);
+//	}
 	
-	public static void main(String[] arg) {
-		Crossword1 cr = new Crossword1();
-		cr.testerHoriz();
-	}
+//	public static void main(String[] arg) {
+//		Crossword1 cr = new Crossword1();
+//		cr.testerHoriz();
+//	}
 
 }
