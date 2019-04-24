@@ -39,7 +39,7 @@ public class FileSearch {
 		}
 	}
 	
-public validFileContents verifyValidity(File f) {
+	public validFileContents verifyValidity(File f) {
 		
 		//actually maybe well return the file contents and return null if the file isnt valid ?
 		//decide this later
@@ -218,5 +218,22 @@ public validFileContents verifyValidity(File f) {
 			}
 		}
 		return word;
+	}
+	
+	public validFileContents checkMatches(validFileContents vfc) {
+		for(int i = 0; i < vfc.acrossWords.length; i++) {
+			for(int j = 0; j < vfc.downWords.length; j++) {
+				if(vfc.acrossWords[i].number == vfc.downWords[j].number) {
+					if(!String.valueOf(vfc.acrossWords[i].word.charAt(0)).equals(
+							String.valueOf(vfc.downWords[j].word.charAt(j)))){
+						return null;
+					} else {
+						vfc.acrossWords[i].match = true;
+						vfc.downWords[j].match = true;
+					}
+				}
+			}
+		}
+		return vfc;
 	}
 }

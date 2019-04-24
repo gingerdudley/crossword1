@@ -25,6 +25,14 @@ public class validFileContents {
 		File file = fs.selectFile();
 		System.out.println(file);
 		validFileContents vfc = fs.verifyValidity(file);
-		//now we need to build the board from this information
+		vfc = fs.checkMatches(vfc);
+		System.out.println("here");
+		//now we need to build the board if everything is valid 
+		if(vfc != null) {
+			Crossword1 cw = new Crossword1();
+			cw.MakeBoardArray(vfc.acrossWords, vfc.downWords);
+		} else {
+			//notify user that the board is invalid and stuff
+		}
 	}
 }

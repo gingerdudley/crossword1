@@ -110,6 +110,8 @@ public class Crossword1 {
 			printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
 			return true;
 			//then all of the words have been placed on the board
+			//and we have all the correct words on the board
+			//we need to somehow return like the word vector
 			
 		} else {
 			Vector<PossiblePlay> possiblePlays = new Vector<PossiblePlay>();
@@ -332,8 +334,6 @@ public class Crossword1 {
 		}
 	}
 	
-	//this will be the recurse method??
-	//by now there should be a vertical word on the board
 	
 	//this method needs to take a word and run through the board and see if it would be a legal move
 	public boolean legalAcrossMove(String[][] board, Word word, int xStart, int yStart, int intersection) {
