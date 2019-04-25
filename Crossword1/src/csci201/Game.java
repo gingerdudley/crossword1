@@ -54,7 +54,7 @@ public class Game {
 		this.gameReady = gameReady;
 	}
 	
-	public void resizeBoard() {
+	public String[][] resizeBoard() {
 		int newXSize = 0;
 		int newYSize = 0;
 		int minY = acrossWords[0].start[0];
@@ -89,9 +89,17 @@ public class Game {
 		System.out.println("yMin: " + minY);
 		System.out.println("xMax: " + maxX);
 		System.out.println("yMax: " + maxY);
+		newXSize = maxX - minX;
+		newYSize = maxY - minY;
+		String[][] holderBoard = new String[newYSize][newXSize];
+		for(int i = 0; i < newYSize; i++) {
+			for(int j = 0; j < newXSize; j++) {
+				holderBoard[i][j] = board[minY + i][minX + j];
+			}
+		}
 		//now we can chop the board down to this new little size for the x
 		//do the same thing but add the length of the word
-		
+		return holderBoard;
 	}
 	
 	public void initializeCurrentBoard() {
