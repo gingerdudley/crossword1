@@ -100,6 +100,13 @@ public class ThreadRoom {
 		}
 	}
 	
+	public void printScores(ServerThread st) {
+		for(ServerThread threads : serverThreads) {
+			threads.sendMessage("Player " + threads.num + " - " + threads.correctAnswers + 
+					" correct answers.");
+		}
+	}
+	
 	public void deleteThread(ServerThread st) {
 		for(int i = 0; i < serverThreads.size(); i++) {
 			if(serverThreads.get(i) == st) {

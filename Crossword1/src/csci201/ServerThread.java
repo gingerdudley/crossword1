@@ -23,10 +23,10 @@ public class ServerThread extends Thread{
 	private ThreadRoom cr;
 	private Lock lock;
 	private Condition con;
-	private int num;
+	public int num;
 	private boolean first;
 	private Game g;
-	private int correctAnswers;
+	public int correctAnswers;
 	private Lock commonlock;
 	public ServerThread(Socket s, ThreadRoom cr, Lock lock, Condition con, int number, Game game, Lock lock2) {
 		try {
@@ -59,6 +59,36 @@ public class ServerThread extends Thread{
 	public void printBoard(String[][] board, int xSize, int ySize) {
 		//System.out.println("HERE IS THE XSIZE: " + xSize);
 		//System.out.println("HERE IS THE YSIZE: " + ySize);
+		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
+			printFinal(board, xSize, ySize);
+			return;
+		}
+		for(int i = 0; i < ySize; i++) {
+			for(int j = 0; j < xSize; j++) {
+				pw.print(board[i][j] + " ");
+			}
+			pw.println();
+		}
+		if(g.downWordsC.size() != 0) {
+			pw.println("ACROSS");
+		}	
+		for(int i = 0; i < g.acrossWordsC.size(); i++) {
+			pw.print(g.acrossWordsC.get(i).number + " ");
+			pw.println(g.acrossWordsC.get(i).question);
+		}
+		pw.println();
+		if(g.downWordsC.size() != 0) {
+			pw.println("DOWN");
+		}		
+		for(int i = 0; i < g.downWordsC.size(); i++) {
+			pw.print(g.downWordsC.get(i).number + " ");
+			pw.println(g.downWordsC.get(i).question);
+		}
+		pw.println();
+		pw.flush();
+	}
+	
+	public void printFinal(String[][] board, int xSize, int ySize) {
 		for(int i = 0; i < ySize; i++) {
 			for(int j = 0; j < xSize; j++) {
 				pw.print(board[i][j] + " ");
@@ -66,18 +96,22 @@ public class ServerThread extends Thread{
 			pw.println();
 		}
 		pw.println("ACROSS");
-		for(int i = 0; i < g.acrossWordsC.size(); i++) {
-			pw.print(g.acrossWordsC.get(i).number + " ");
-			pw.println(g.acrossWordsC.get(i).question);
+		for(int i = 0; i < g.acrossWords.length; i++) {
+			pw.print(g.acrossWords[i].number + " ");
+			pw.println(g.acrossWords[i].question);
 		}
 		pw.println();
 		pw.println("DOWN");
-		for(int i = 0; i < g.downWordsC.size(); i++) {
-			pw.print(g.downWordsC.get(i).number + " ");
-			pw.println(g.downWordsC.get(i).question);
+		for(int i = 0; i < g.downWords.length; i++) {
+			pw.print(g.downWords[i].number + " ");
+			pw.println(g.downWords[i].question);
 		}
 		pw.println();
 		pw.flush();
+		
+		this.sendMessage("Final Score: ");
+		cr.printScores(this);
+		
 	}
 	
 	public void run() {
@@ -292,7 +326,8 @@ public class ServerThread extends Thread{
 							+ numm + " across", this);
 					if(line.equals(g.acrossWords[index].word)) {
 						this.sendMessage("Correct!");
-						cr.broadcast("That is correct.", this);
+						this.correctAnswers += 1;
+						cr.broadcastMinusCurr("That is correct.", this);
 						this.placeWordOnBoard(true, index, g.acrossWords[index]);
 					} else {
 						this.sendMessage("That is incorrect!");
