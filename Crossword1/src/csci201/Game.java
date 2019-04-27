@@ -85,20 +85,37 @@ public class Game {
 				maxY = downWords[i].start[0] + downWords[i].word.length();
 			}
 		}
-		System.out.println("xMin: " + minX);
-		System.out.println("yMin: " + minY);
-		System.out.println("xMax: " + maxX);
-		System.out.println("yMax: " + maxY);
+//		System.out.println("xMin: " + minX);
+//		System.out.println("yMin: " + minY);
+//		System.out.println("xMax: " + maxX);
+//		System.out.println("yMax: " + maxY);
 		newXSize = maxX - minX;
 		newYSize = maxY - minY;
-		String[][] holderBoard = new String[newYSize][newXSize];
-		for(int i = 0; i < newYSize; i++) {
-			for(int j = 0; j < newXSize; j++) {
-				holderBoard[i][j] = board[minY + i][minX + j];
+		String[][] holderBoard = new String[newYSize + 1][newXSize * 2];
+		for(int i = 0; i < newYSize + 1; i++) {
+			for(int j = 0; j < newXSize * 2; j++) {
+//				if(j == 0) {
+//					holderBoard[i][j] = "@";
+//				} 
+				if(j%2 == 1) {
+					holderBoard[i][j] = board[minY + i][minX + (j / 2)];
+				} else {
+					holderBoard[i][j] = "!";
+				}			
 			}
 		}
-		//now we can chop the board down to this new little size for the x
-		//do the same thing but add the length of the word
+		for(int i = 0; i < acrossWords.length; i++) {
+			int xPos = acrossWords[i].start[1];
+			//acrossWords[i].start[1] = xPos * 2;
+			int xS = (xPos - minX) * 2 + 2;
+			System.out.println("x POSITION: " + xS);
+			int yS = acrossWords[i].start[0] - minY;
+			System.out.println("y position: " + yS);
+			holderBoard[yS][xS - 2] = Integer.toString(acrossWords[i].number);
+		}
+		//now we need to multiply the board x side by two and make the places where
+		//the letters are blanks
+
 		return holderBoard;
 	}
 	

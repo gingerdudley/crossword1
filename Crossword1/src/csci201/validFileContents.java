@@ -44,7 +44,7 @@ public class validFileContents {
 			//test to see if this prints the correct board !!
 			cw.printBoard(vfc.g.board, vfc.g.xSize, vfc.g.ySize);
 			String[][] holderB = vfc.g.resizeBoard();
-			cw.printBoard(holderB, 11, 13);
+			cw.printBoard(holderB, 22, 13);
 		} else {
 			//notify user that the board is invalid and stuff
 			System.out.println("nullll bitchhhh");
