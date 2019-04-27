@@ -108,10 +108,19 @@ public class Game {
 			int xPos = acrossWords[i].start[1];
 			//acrossWords[i].start[1] = xPos * 2;
 			int xS = (xPos - minX) * 2 + 2;
-			System.out.println("x POSITION: " + xS);
+			//System.out.println("x POSITION: " + xS);
 			int yS = acrossWords[i].start[0] - minY;
-			System.out.println("y position: " + yS);
+			//System.out.println("y position: " + yS);
 			holderBoard[yS][xS - 2] = Integer.toString(acrossWords[i].number);
+		}
+		for(int i = 0; i < downWords.length; i++) {
+			int xPos = downWords[i].start[1];
+			//acrossWords[i].start[1] = xPos * 2;
+			int xS = (xPos - minX) * 2;
+			//System.out.println("x POSITION: " + xS);
+			int yS = downWords[i].start[0] - minY;
+			//System.out.println("y position: " + yS);
+			holderBoard[yS][xS] = Integer.toString(downWords[i].number);
 		}
 		//now we need to multiply the board x side by two and make the places where
 		//the letters are blanks
