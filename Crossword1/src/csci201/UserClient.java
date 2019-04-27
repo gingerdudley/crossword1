@@ -73,7 +73,6 @@ public class UserClient extends Thread {
 			hostname = reader.readLine(); 
 			System.out.println("Enter the server port: ");
 			port = Integer.valueOf(reader.readLine()); 
-			int i = 0;
 			
 		} catch(IOException ioe) {
 			System.out.println("IOException: " + ioe.getMessage());

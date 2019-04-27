@@ -255,8 +255,8 @@ public class ServerThread extends Thread{
 						this.sendMessage("Correct!");
 						this.correctAnswers += 1;
 						cr.broadcastMinusCurr("That is correct.", this);
-						this.placeWordOnBoard(true, index, g.downWords[index]);
-						cr.printBoardAll();
+						this.placeWordOnBoard(false, index, g.downWords[index]);
+						//cr.printBoardAll();
 					} else {
 						this.sendMessage("That is incorrect!");
 						cr.broadcastMinusCurr("That is incorrect.", this);
@@ -328,8 +328,8 @@ public class ServerThread extends Thread{
 				}
 			}
 		} else {
-			int x = g.downWords[index].start[1];
-			int y = g.downWords[index].start[0];
+			int x = (g.downWords[index].start[1] - g.minX) * 2 + 1;
+			int y = g.downWords[index].start[0] - g.minY;
 			for(int i = 0; i < g.downWords[index].word.length(); i++) {
 				g.currentBoard[y + i][x] = String.valueOf(g.downWords[index].word.charAt(i));
 			}
@@ -340,7 +340,8 @@ public class ServerThread extends Thread{
 				}
 			}
 		}
-		this.printBoard(g.currentBoard, g.currX, g.currY);
+		//this.printBoard(g.currentBoard, g.currX, g.currY);
+		cr.printBoardAll();
 	}
 	
 }
