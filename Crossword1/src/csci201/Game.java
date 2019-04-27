@@ -9,6 +9,7 @@ public class Game {
 	public String[][] board;
 	//gonna need a different array for the current board vs the correct board
 	public String[][] currentBoard;
+	public String[][] smallBoard;
 	public int xSize;
 	public int ySize;
 	public boolean started;
@@ -85,22 +86,15 @@ public class Game {
 				maxY = downWords[i].start[0] + downWords[i].word.length();
 			}
 		}
-//		System.out.println("xMin: " + minX);
-//		System.out.println("yMin: " + minY);
-//		System.out.println("xMax: " + maxX);
-//		System.out.println("yMax: " + maxY);
 		newXSize = maxX - minX;
 		newYSize = maxY - minY;
-		String[][] holderBoard = new String[newYSize + 1][newXSize * 2];
+		smallBoard = new String[newYSize + 1][newXSize * 2];
 		for(int i = 0; i < newYSize + 1; i++) {
 			for(int j = 0; j < newXSize * 2; j++) {
-//				if(j == 0) {
-//					holderBoard[i][j] = "@";
-//				} 
 				if(j%2 == 1) {
-					holderBoard[i][j] = board[minY + i][minX + (j / 2)];
+					smallBoard[i][j] = board[minY + i][minX + (j / 2)];
 				} else {
-					holderBoard[i][j] = "!";
+					smallBoard[i][j] = "!";
 				}			
 			}
 		}
@@ -111,7 +105,7 @@ public class Game {
 			//System.out.println("x POSITION: " + xS);
 			int yS = acrossWords[i].start[0] - minY;
 			//System.out.println("y position: " + yS);
-			holderBoard[yS][xS - 2] = Integer.toString(acrossWords[i].number);
+			smallBoard[yS][xS - 2] = Integer.toString(acrossWords[i].number);
 		}
 		for(int i = 0; i < downWords.length; i++) {
 			int xPos = downWords[i].start[1];
@@ -120,12 +114,28 @@ public class Game {
 			//System.out.println("x POSITION: " + xS);
 			int yS = downWords[i].start[0] - minY;
 			//System.out.println("y position: " + yS);
-			holderBoard[yS][xS] = Integer.toString(downWords[i].number);
+			smallBoard[yS][xS] = Integer.toString(downWords[i].number);
 		}
 		//now we need to multiply the board x side by two and make the places where
 		//the letters are blanks
-
-		return holderBoard;
+		currentBoard = new String[newYSize + 1][newXSize * 2];
+		for(int i = 0; i < newYSize + 1; i++) {
+			for(int j = 0; j < newXSize * 2; j++) {
+				if(smallBoard[i][j].equals("!") || smallBoard[i][j].equals("@")) {
+					currentBoard[i][j] = " ";
+				} else if(smallBoard[i][j].equals("1") || smallBoard[i][j].equals("2") ||
+						smallBoard[i][j].equals("3") || smallBoard[i][j].equals("4") || 
+						smallBoard[i][j].equals("5") || smallBoard[i][j].equals("6") ||
+						smallBoard[i][j].equals("7") || smallBoard[i][j].equals("8") ||
+						smallBoard[i][j].equals("9")) {
+					currentBoard[i][j] = smallBoard[i][j];
+				} else {
+					currentBoard[i][j] = "_";
+				}
+			}
+		}
+		
+		return currentBoard;
 	}
 	
 	public void initializeCurrentBoard() {
