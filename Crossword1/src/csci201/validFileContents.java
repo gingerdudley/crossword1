@@ -21,33 +21,37 @@ public class validFileContents {
 //		
 //	}
 	
-	public static void main(String[] args) {
-		validFileContents vf = new validFileContents();
-		vf.setUpGame();
-	}
+//	public static void main(String[] args) {
+//		validFileContents vf = new validFileContents();
+//		vf.setUpGame();
+//	}
 	
-	public void setUpGame() {
+	public validFileContents setUpGame(Game game, validFileContents vfc) {
 		FileSearch fs = new FileSearch();
 		File file = fs.selectFile();
 		System.out.println(file);
-		validFileContents vfc = fs.verifyValidity(file);
+		vfc = fs.verifyValidity(file);
 		vfc = fs.checkMatches(vfc);
 		System.out.println("here");
 		//now we need to build the board if everything is valid 
 		if(vfc != null) {
 			vfc.g = new Game();
+			//gonna replace this
+			//with the new game stuff
 			Crossword1 cw = new Crossword1();
 			cw.MakeBoardArray(vfc.acrossWords, vfc.downWords, vfc.g, vfc);
 			//now test the game and see whats working 
-			System.out.println("Testing");
+			//System.out.println("Testing");
 			
 			//test to see if this prints the correct board !!
 			cw.printBoard(vfc.g.board, vfc.g.xSize, vfc.g.ySize);
 			String[][] holderB = vfc.g.resizeBoard();
-			cw.printBoard(holderB, 22, 13);
+			//cw.printBoard(holderB, 22, 13);
+			return vfc;
 		} else {
 			//notify user that the board is invalid and stuff
-			System.out.println("nullll bitchhhh");
+			//System.out.println("nullll bitchhhh");
+			return null;
 			//we need to notify the client of this and act accordingly
 		}
 	}

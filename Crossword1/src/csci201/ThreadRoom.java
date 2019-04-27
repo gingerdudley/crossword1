@@ -17,6 +17,7 @@ public class ThreadRoom {
 	private Game game;
 	private int num = 0;
 	private int threadNum = 0;
+	public validFileContents vfc;
 	FakeBoard fb;
 	public ServerSocket ss;
 	//private int 
@@ -30,18 +31,36 @@ public class ThreadRoom {
 			conditionVector = new Vector<Condition>();
 			waitingVector = new Vector<Condition>();
 			game = new Game();
-			fb = new FakeBoard();
-			game.board = fb.makeFakeB();
-			game.currentBoard = fb.makeFakeC();
-			fb.setFakeGame(game);
+			
+			//changing everything here
+			//fb = new FakeBoard();
+			//game.board = fb.makeFakeB();
+			//game.currentBoard = fb.makeFakeC();
+			//fb.setFakeGame(game);
+			
+			//need to change this it is WRONGGGGGGGGGGG
+			
 			//also setting up some fake stuff with the board
-			game.ySize = 13;
-			game.xSize = 11;
+			//game.ySize = 13;
+			//game.xSize = 11;
 			//^^change this when you actually start integrating the real functional board
 			//set the board rn to the fake board but make note to change this later
+			boolean fileFound = false;
+			vfc = new validFileContents();
 			while(true) {
 				Socket s = ss.accept(); // blocking
 				System.out.println("Connection from: " + s.getInetAddress());
+				//now read the random game file
+				if(fileFound == false) {
+					System.out.println("Reading random game file.");
+					vfc = vfc.setUpGame(game, vfc);
+					if(vfc == null) {
+						//then you need to pick another file and check its validity
+					} else {
+						fileFound = true;
+					}
+				}
+				
 				Lock lock = new ReentrantLock();
 				Lock lock2 = new ReentrantLock();
 				Condition con = lock.newCondition();
@@ -50,7 +69,7 @@ public class ThreadRoom {
 				conditionVector.add(con);
 				waitingVector.add(conn2);
 				num++;
-				ServerThread st = new ServerThread(s, this, lock, con, num, game, lock2);
+				ServerThread st = new ServerThread(s, this, lock, con, num, vfc.g, lock2);
 				serverThreads.add(st);
 			}
 		} catch (IOException ioe) {
@@ -90,13 +109,15 @@ public class ThreadRoom {
 	}
 	
 	public void printBoard(ServerThread st) {
-		st.printBoard(game.board, game.xSize, game.ySize);
+		//st.printBoard(game.board, game.xSize, game.ySize);
+		st.printBoard(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 	}
 	
 	public void printBoardAll() {
 		//this will print the current gameboard
 		for(ServerThread threads : serverThreads) {
-			threads.printBoard(game.board, game.xSize, game.ySize);
+			//threads.printBoard(game.board, game.xSize, game.ySize);
+			threads.printBoard(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 		}
 	}
 	

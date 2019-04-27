@@ -12,6 +12,10 @@ public class Game {
 	public String[][] smallBoard;
 	public int xSize;
 	public int ySize;
+	public int currX;
+	public int currY;
+	public int minX;
+	public int minY;
 	public boolean started;
 	Word[] acrossWords;
 	Word[] downWords;
@@ -23,6 +27,8 @@ public class Game {
 		currPlayers = 0;
 		numPlayers = 0;
 		started = false;
+		acrossWordsC = new Vector<Word>();
+		downWordsC = new Vector<Word>();
 	}
 
 	public int getNumPlayers() {
@@ -58,12 +64,18 @@ public class Game {
 	public String[][] resizeBoard() {
 		int newXSize = 0;
 		int newYSize = 0;
-		int minY = acrossWords[0].start[0];
-		int minX = acrossWords[0].start[1];
+		minY = acrossWords[0].start[0];
+		minX = acrossWords[0].start[1];
 		int maxY = downWords[0].start[0] + downWords[0].word.length();
 		//^add the length of the word to the y position
 		int maxX = acrossWords[0].start[1] + acrossWords[0].word.length();
 		//run through all the words and find their starting x and y position
+		for(int i = 0; i < acrossWords.length; i++) {
+			acrossWordsC.add(acrossWords[i]);
+		}
+		for(int j = 0; j < downWords.length; j++) {
+			downWordsC.add(downWords[j]);
+		}
 		for(int i = 1; i < acrossWords.length; i++) {
 			if(acrossWords[i].start[0] < minY) {
 				minY = acrossWords[i].start[0];
@@ -88,6 +100,8 @@ public class Game {
 		}
 		newXSize = maxX - minX;
 		newYSize = maxY - minY;
+		currX = newXSize * 2;
+		currY = newYSize + 1;
 		smallBoard = new String[newYSize + 1][newXSize * 2];
 		for(int i = 0; i < newYSize + 1; i++) {
 			for(int j = 0; j < newXSize * 2; j++) {

@@ -57,6 +57,8 @@ public class ServerThread extends Thread{
 	}
 	
 	public void printBoard(String[][] board, int xSize, int ySize) {
+		//System.out.println("HERE IS THE XSIZE: " + xSize);
+		//System.out.println("HERE IS THE YSIZE: " + ySize);
 		for(int i = 0; i < ySize; i++) {
 			for(int j = 0; j < xSize; j++) {
 				pw.print(board[i][j] + " ");
@@ -129,8 +131,9 @@ public class ServerThread extends Thread{
 					//then we want to wait for the next people to join
 					//code block at this line
 					if(!isReady) {
-						System.out.println("current players in game: " + g.getCurrPlayers());
-						System.out.println("num players in game: " + g.getNumPlayers());
+						//System.out.println("current players in game: " + g.getCurrPlayers());
+						//System.out.println("num players in game: " + g.getNumPlayers());
+						System.out.println("Number of players: " + g.getCurrPlayers());
 						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 					}
 					//make this an await and signal if the game is ready
@@ -172,12 +175,6 @@ public class ServerThread extends Thread{
 					System.out.println(ie.getMessage());
 				}
 				
-				//now add a condition if its the start of the game
-//				if(round1) {
-//					round1 = false;
-//					cr.startingUnlock();
-//					//test this out and see was up
-//				}
 				System.out.println("made it here");
 				this.playMove();
 			}
@@ -319,10 +316,10 @@ public class ServerThread extends Thread{
 		//grab the word from the the answer and place it on the guessed board
 		if(across) {
 			//then place the word across starting at that index
-			int x = g.acrossWords[index].start[1];
-			int y = g.acrossWords[index].start[0];
+			int x = (g.acrossWords[index].start[1] - g.minX) * 2 + 1;
+			int y = g.acrossWords[index].start[0] - g.minY;
 			for(int i = 0; i < g.acrossWords[index].word.length(); i++) {
-				g.currentBoard[y][x + i] = String.valueOf(g.acrossWords[index].word.charAt(i));
+				g.currentBoard[y][x + (i * 2)] = String.valueOf(g.acrossWords[index].word.charAt(i));
 			}
 			for(int i = 0; i < g.acrossWordsC.size(); i++) {
 				if(g.acrossWordsC.get(i).equals(word)) {
@@ -343,7 +340,7 @@ public class ServerThread extends Thread{
 				}
 			}
 		}
-		this.printBoard(g.currentBoard, g.xSize, g.ySize);
+		this.printBoard(g.currentBoard, g.currX, g.currY);
 	}
 	
 }
