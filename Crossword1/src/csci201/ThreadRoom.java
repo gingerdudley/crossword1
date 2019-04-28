@@ -101,10 +101,11 @@ public class ThreadRoom {
 	}
 	
 	public void printScores(ServerThread st) {
-		for(ServerThread threads : serverThreads) {
-			threads.sendMessage("Player " + threads.num + " - " + threads.correctAnswers + 
-					" correct answers.");
-		}
+			for(int j = 0; j < serverThreads.size(); j++) {
+				st.sendMessage("Player " + 
+						serverThreads.get(j).num + " - " + serverThreads.get(j).correctAnswers + 
+						" correct answers.");
+				}
 	}
 	
 	public void deleteThread(ServerThread st) {
@@ -125,6 +126,13 @@ public class ThreadRoom {
 		for(ServerThread threads : serverThreads) {
 			//threads.printBoard(game.board, game.xSize, game.ySize);
 			threads.printBoard(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
+		}
+	}
+	
+	public void printFinalAll() {
+		for(ServerThread threads : serverThreads) {
+			//threads.printBoard(game.board, game.xSize, game.ySize);
+			threads.printFinal(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 		}
 	}
 	

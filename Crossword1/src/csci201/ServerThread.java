@@ -56,20 +56,25 @@ public class ServerThread extends Thread{
 		pw.flush();
 	}
 	
+	public void restartGame() {
+		//call a restart method in the thread room to delete all the current threads
+	}
+	
 	public void printBoard(String[][] board, int xSize, int ySize) {
 		//System.out.println("HERE IS THE XSIZE: " + xSize);
 		//System.out.println("HERE IS THE YSIZE: " + ySize);
-		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
-			printFinal(board, xSize, ySize);
-			return;
-		}
+//		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
+//			printFinal(board, xSize, ySize);
+//			restartGame();
+//			//return;
+//		}
 		for(int i = 0; i < ySize; i++) {
 			for(int j = 0; j < xSize; j++) {
 				pw.print(board[i][j] + " ");
 			}
 			pw.println();
 		}
-		if(g.downWordsC.size() != 0) {
+		if(g.acrossWordsC.size() != 0) {
 			pw.println("ACROSS");
 		}	
 		for(int i = 0; i < g.acrossWordsC.size(); i++) {
@@ -281,6 +286,7 @@ public class ServerThread extends Thread{
 					}
 					this.sendMessage("What is your guess for " + numm + " down?");
 					line = br.readLine();
+					line = line.toLowerCase();
 					//now do some checking but rn just print a simple statement
 					this.sendMessage("You guessed: " + line);
 					cr.broadcast("Player " + num + " guessed '" + line + "' for "
@@ -319,6 +325,7 @@ public class ServerThread extends Thread{
 					}
 					this.sendMessage("What is your guess for " + numm + " across?");
 					line = br.readLine();
+					line = line.toLowerCase();
 					//now do some checking but rn just print a simple statement
 					this.sendMessage("You guessed: " + line);
 					
@@ -375,8 +382,16 @@ public class ServerThread extends Thread{
 				}
 			}
 		}
-		//this.printBoard(g.currentBoard, g.currX, g.currY);
-		cr.printBoardAll();
+		
+		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
+			//printFinal(board, xSize, ySize);
+			cr.printFinalAll();
+			//restartGame();
+			//return;
+		} else {
+			cr.printBoardAll();
+		}
+		
 	}
 	
 }
