@@ -17,9 +17,12 @@ public class ThreadRoom {
 	private Game game;
 	private int num = 0;
 	private int threadNum = 0;
+	int playersRestarted = 1;
 	public validFileContents vfc;
 	FakeBoard fb;
 	public ServerSocket ss;
+	//public UserClient uc;
+	public Vector<Socket> socketVec;
 	//private int 
 	public ThreadRoom(int port) {
 		try {
@@ -30,6 +33,7 @@ public class ThreadRoom {
 			lockVector = new Vector<Lock>();
 			conditionVector = new Vector<Condition>();
 			waitingVector = new Vector<Condition>();
+			socketVec = new Vector<Socket>();
 			game = new Game();
 			
 			//changing everything here
@@ -50,6 +54,7 @@ public class ThreadRoom {
 			while(true) {
 				Socket s = ss.accept(); // blocking
 				System.out.println("Connection from: " + s.getInetAddress());
+				socketVec.add(s);
 				//now read the random game file
 				if(fileFound == false) {
 					System.out.println("Reading random game file.");
@@ -101,11 +106,18 @@ public class ThreadRoom {
 	}
 	
 	public void printScores(ServerThread st) {
+			int winnerNum = serverThreads.get(0).correctAnswers;
+			int winnerID = 1;
 			for(int j = 0; j < serverThreads.size(); j++) {
+				if(winnerNum < serverThreads.get(j).correctAnswers) {
+					winnerNum = serverThreads.get(j).correctAnswers;
+					winnerID = serverThreads.get(j).num;
+				} 
 				st.sendMessage("Player " + 
 						serverThreads.get(j).num + " - " + serverThreads.get(j).correctAnswers + 
 						" correct answers.");
 				}
+			st.sendMessage("Player " + winnerID + " is the winner.");
 	}
 	
 	public void deleteThread(ServerThread st) {
@@ -133,6 +145,20 @@ public class ThreadRoom {
 		for(ServerThread threads : serverThreads) {
 			//threads.printBoard(game.board, game.xSize, game.ySize);
 			threads.printFinal(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
+		}
+	}
+	
+	public void endGame() {
+		for(int i = 0; i < socketVec.size(); i++) {
+			try {
+				socketVec.get(i).close();
+			} catch(IOException ioe) {
+				System.out.println(ioe.getMessage());
+			}
+			
+		}
+		for(int i = 0; i < serverThreads.size(); i++) {
+			this.deleteThread(serverThreads.get(0));
 		}
 	}
 	

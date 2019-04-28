@@ -56,18 +56,7 @@ public class ServerThread extends Thread{
 		pw.flush();
 	}
 	
-	public void restartGame() {
-		//call a restart method in the thread room to delete all the current threads
-	}
-	
 	public void printBoard(String[][] board, int xSize, int ySize) {
-		//System.out.println("HERE IS THE XSIZE: " + xSize);
-		//System.out.println("HERE IS THE YSIZE: " + ySize);
-//		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
-//			printFinal(board, xSize, ySize);
-//			restartGame();
-//			//return;
-//		}
 		for(int i = 0; i < ySize; i++) {
 			for(int j = 0; j < xSize; j++) {
 				pw.print(board[i][j] + " ");
@@ -193,12 +182,7 @@ public class ServerThread extends Thread{
 				
 				
 				g.started = true;
-				//cr.broadcast("The game is beginning", this);
 				this.sendMessage("The game is beginning");
-				//now we need to start the actual gameplay
-				//now send the board to the players
-				
-				//maybe put the while true loop here
 				boolean round1 = true;
 			while(true) {
 				//now we need to put an await back on one and lock one
@@ -254,8 +238,6 @@ public class ServerThread extends Thread{
 					}
 					//return;
 				}
-				//dont want to print if the last answer was invalid
-				//if()
 				this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
 				if(firstPass) {
 					cr.broadcastMinusCurr("Player's " + num + " turn", this);
@@ -387,7 +369,13 @@ public class ServerThread extends Thread{
 			//printFinal(board, xSize, ySize);
 			cr.printFinalAll();
 			//restartGame();
-			//return;
+			if(cr.playersRestarted != g.getNumPlayers()) {
+				cr.playersRestarted += 1;
+				//maybe make a while true loop to keep them here until they get deleted??
+			} else {
+				//then the last player has gotten here and we must restart the game
+				cr.endGame();
+			}
 		} else {
 			cr.printBoardAll();
 		}
