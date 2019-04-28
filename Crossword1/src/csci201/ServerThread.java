@@ -142,15 +142,12 @@ public class ServerThread extends Thread{
 					if(num > g.getNumPlayers()) {
 						this.sendMessage("game is full");
 						cr.deleteThread(this);
-						//cr.ss.close();
 						while(true) {
 							int hi = 0;
 							hi += 1;
 							hi -= 1;
 						}
 					}
-					//figure out how to discard the people that locked before
-					
 					//tell them that the game is already full if the player num is maxed
 				}
 				
@@ -159,16 +156,13 @@ public class ServerThread extends Thread{
 					//then we want to wait for the next people to join
 					//code block at this line
 					if(!isReady) {
-						//System.out.println("current players in game: " + g.getCurrPlayers());
-						//System.out.println("num players in game: " + g.getNumPlayers());
 						System.out.println("Number of players: " + g.getCurrPlayers());
 						cr.broadcast("Waiting for player : " + (g.getCurrPlayers() + 1), this);
 					}
 					//make this an await and signal if the game is ready
 					while(!isReady) {
 						con.await();
-						isReady = g.isGameReady();
-						//System.out.print("");		
+						isReady = g.isGameReady();	
 					}
 				} else {
 					//if youre player two you signal player 1 and player 3 signals player 1 and 2
@@ -222,11 +216,9 @@ public class ServerThread extends Thread{
 			while(!validAnswer) {
 				//ask the current player to make a move and then parse it
 				if(stop) {
-					//lock.unlock();
 					cr.clientUnlock();
 					validAnswer = true;
 					lock.lock();
-//					firstPass = true;
 					try {
 						con.await();
 						firstPass = true;
@@ -236,7 +228,6 @@ public class ServerThread extends Thread{
 					} catch(InterruptedException ie) {
 						System.out.println(ie.getMessage());
 					}
-					//return;
 				}
 				this.sendMessage("Would you like to answer a question across (a) or down (d) ?");
 				if(firstPass) {
@@ -278,11 +269,9 @@ public class ServerThread extends Thread{
 						this.correctAnswers += 1;
 						cr.broadcastMinusCurr("That is correct.", this);
 						this.placeWordOnBoard(false, index, g.downWords[index]);
-						//cr.printBoardAll();
 					} else {
 						this.sendMessage("That is incorrect!");
 						cr.broadcastMinusCurr("That is incorrect.", this);
-						//cr.printBoardAll();
 						stop = true;
 					}
 				} else if(line.equals("a")){
@@ -292,7 +281,6 @@ public class ServerThread extends Thread{
 						line = br.readLine();
 						numm = Integer.valueOf(line);
 						boolean found = false;
-	//					int index = 0;
 						for(int i = 0; i < g.acrossWords.length; i++) {
 							if(g.acrossWords[i].number == numm) {
 								found = true;
@@ -334,8 +322,6 @@ public class ServerThread extends Thread{
 		}
 	}
 	
-	
-	
 	public void placeWordOnBoard(boolean across, int index, Word word) {
 		//grab the word from the the answer and place it on the guessed board
 		if(across) {
@@ -363,12 +349,9 @@ public class ServerThread extends Thread{
 					break;
 				}
 			}
-		}
-		
+		}		
 		if(g.acrossWordsC.size() == 0 && g.downWordsC.size() == 0) {
-			//printFinal(board, xSize, ySize);
 			cr.printFinalAll();
-			//restartGame();
 			if(cr.playersRestarted != g.getNumPlayers()) {
 				cr.playersRestarted += 1;
 				//maybe make a while true loop to keep them here until they get deleted??
@@ -378,9 +361,7 @@ public class ServerThread extends Thread{
 			}
 		} else {
 			cr.printBoardAll();
-		}
-		
-	}
-	
+		}	
+	}	
 }
 

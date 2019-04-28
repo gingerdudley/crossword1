@@ -21,9 +21,7 @@ public class ThreadRoom {
 	public validFileContents vfc;
 	FakeBoard fb;
 	public ServerSocket ss;
-	//public UserClient uc;
-	public Vector<Socket> socketVec;
-	//private int 
+	public Vector<Socket> socketVec; 
 	public ThreadRoom(int port) {
 		try {
 			System.out.println("Binding to port " + port);
@@ -36,19 +34,6 @@ public class ThreadRoom {
 			socketVec = new Vector<Socket>();
 			game = new Game();
 			
-			//changing everything here
-			//fb = new FakeBoard();
-			//game.board = fb.makeFakeB();
-			//game.currentBoard = fb.makeFakeC();
-			//fb.setFakeGame(game);
-			
-			//need to change this it is WRONGGGGGGGGGGG
-			
-			//also setting up some fake stuff with the board
-			//game.ySize = 13;
-			//game.xSize = 11;
-			//^^change this when you actually start integrating the real functional board
-			//set the board rn to the fake board but make note to change this later
 			boolean fileFound = false;
 			vfc = new validFileContents();
 			while(true) {
@@ -84,11 +69,8 @@ public class ThreadRoom {
 	
 	public void broadcast(String message, ServerThread st) {
 		if (message != null) {
-			//System.out.println(message);
 			for(ServerThread threads : serverThreads) {
-				//if (st != threads) {
 					threads.sendMessage(message);
-				//}
 			}
 		}
 	}
@@ -96,7 +78,6 @@ public class ThreadRoom {
 	public void broadcastMinusCurr(String message, ServerThread st) {
 		//use this to send stuff to the other threads
 		if (message != null) {
-			//System.out.println(message);
 			for(ServerThread threads : serverThreads) {
 				if (st != threads) {
 					threads.sendMessage(message);
@@ -129,21 +110,18 @@ public class ThreadRoom {
 	}
 	
 	public void printBoard(ServerThread st) {
-		//st.printBoard(game.board, game.xSize, game.ySize);
 		st.printBoard(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 	}
 	
 	public void printBoardAll() {
 		//this will print the current gameboard
 		for(ServerThread threads : serverThreads) {
-			//threads.printBoard(game.board, game.xSize, game.ySize);
 			threads.printBoard(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 		}
 	}
 	
 	public void printFinalAll() {
 		for(ServerThread threads : serverThreads) {
-			//threads.printBoard(game.board, game.xSize, game.ySize);
 			threads.printFinal(vfc.g.currentBoard, vfc.g.currX, vfc.g.currY);
 		}
 	}

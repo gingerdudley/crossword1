@@ -7,7 +7,6 @@ public class Game {
 	private int currPlayers; 
 	private boolean gameReady;
 	public String[][] board;
-	//gonna need a different array for the current board vs the correct board
 	public String[][] currentBoard;
 	public String[][] smallBoard;
 	public int xSize;
@@ -114,20 +113,14 @@ public class Game {
 		}
 		for(int i = 0; i < acrossWords.length; i++) {
 			int xPos = acrossWords[i].start[1];
-			//acrossWords[i].start[1] = xPos * 2;
 			int xS = (xPos - minX) * 2 + 2;
-			//System.out.println("x POSITION: " + xS);
 			int yS = acrossWords[i].start[0] - minY;
-			//System.out.println("y position: " + yS);
 			smallBoard[yS][xS - 2] = Integer.toString(acrossWords[i].number);
 		}
 		for(int i = 0; i < downWords.length; i++) {
 			int xPos = downWords[i].start[1];
-			//acrossWords[i].start[1] = xPos * 2;
 			int xS = (xPos - minX) * 2;
-			//System.out.println("x POSITION: " + xS);
 			int yS = downWords[i].start[0] - minY;
-			//System.out.println("y position: " + yS);
 			smallBoard[yS][xS] = Integer.toString(downWords[i].number);
 		}
 		//now we need to multiply the board x side by two and make the places where
@@ -150,10 +143,5 @@ public class Game {
 		}
 		
 		return currentBoard;
-	}
-	
-	public void initializeCurrentBoard() {
-		//we need to set the current board to the correct syntax with the spaceing and stuff
-		//take the x position of each word and multiply it, first we need to resize the board
 	}
 }

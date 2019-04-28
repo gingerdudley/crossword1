@@ -67,7 +67,6 @@ public class FileTester {
 					line = line.toLowerCase();
 					//process all the contents for the across section
 					if(line.equals("across") && acrossFound == false && dNum != 0) {
-						//return false;
 						//then u need to parse out them words
 						while ((line = br.readLine()) != null) {
 							line = line.toLowerCase();
@@ -90,10 +89,6 @@ public class FileTester {
 							}
 						}
 						break;
-//						aNum++;
-//						Word returnedWord = ParseData(line, true);
-//						acrossV.add(returnedWord);
-						
 					} else if((line.equals("across") && acrossFound == true) || (line.equals("across") && dNum == 0)){
 						return false;
 					} else if(line.equals("down")) {
@@ -113,10 +108,6 @@ public class FileTester {
 			if(aNum == 0 || dNum == 0) {
 				return false;
 			}
-			//check to make sure this 1st line is across or down
-//			while ((line = br.readLine()) != null) {
-//				//now process the line
-//			}
 			fr.close();
 			br.close();
 		} catch (IOException e) {
@@ -137,6 +128,7 @@ public class FileTester {
 		}
 		if(paramNum < 2) {
 			//then we have a problem and need to return null
+			return null;
 		} else {
 			
 			if(across) {

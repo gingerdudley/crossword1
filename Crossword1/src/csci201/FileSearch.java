@@ -90,7 +90,6 @@ public class FileSearch {
 				}
 				
 			} 
-			//System.out.println("line value: " + line);
 			if(line.equals("down")) {		
 				downFound = true;
 				while ((line = br.readLine()) != null) {
@@ -120,9 +119,6 @@ public class FileSearch {
 							}
 						}
 						break;
-//						aNum++;
-//						Word returnedWord = ParseData(line, true);
-//						acrossV.add(returnedWord);
 						
 					} else if((line.equals("across") && acrossFound == true) || (line.equals("across") && dNum == 0)){
 						return null;

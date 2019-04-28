@@ -62,7 +62,7 @@ public class Crossword1 {
 			words[matchIndex].start[0] = middleY;
 			words[matchIndex].start[1] = middleX;			
 		}		
-		printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
+		//printBoard(board, (acrossSize * 2 + 1), (downSize * 2 + 1));
 		//boolean worked = findNextWord(acrossWords.length, downWords.length, words, board);
 		boolean worked = findNextWord(acrossWords.length, downWords.length, words, board, true, game, vf);
 	}

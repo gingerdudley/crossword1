@@ -133,22 +133,4 @@ public class FakeBoard {
 		}
 		
 	}
-	
-//	public void printBoard() {
-//		String[][] board = this.makeFakeB();
-//		//this will print the current gameboard
-//		for(int i = 0; i < 13; i++) {
-//			for(int j = 0; j < 11; j++) {
-//				System.out.print(board[i][j] + " ");
-//			}
-//			System.out.println();
-//		}
-//		
-//		System.out.println();
-//	}
-	
-//	public static void main(String[] args) {
-//		FakeBoard fb = new FakeBoard();
-//		fb.printBoard();
-//	}
 }
